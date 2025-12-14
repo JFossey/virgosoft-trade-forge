@@ -99,10 +99,9 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { useAuth } from '../composables/useAuth';
 
-const router = useRouter();
+const { errors, loading, register } = useAuth();
 
 const form = ref({
     name: '',
@@ -111,36 +110,7 @@ const form = ref({
     password_confirmation: '',
 });
 
-const errors = ref([]);
-const loading = ref(false);
-
 const handleRegister = async () => {
-    errors.value = [];
-    loading.value = true;
-
-    try {
-        // Get CSRF cookie first
-        await axios.get('/sanctum/csrf-cookie');
-
-        // Register user
-        const response = await axios.post('/api/register', form.value);
-
-        if (response.data.user) {
-            // Redirect to home page after successful registration
-            router.push('/');
-        }
-    } catch (error) {
-        if (error.response?.data?.errors) {
-            // Laravel validation errors
-            const validationErrors = error.response.data.errors;
-            errors.value = Object.values(validationErrors).flat();
-        } else if (error.response?.data?.message) {
-            errors.value = [error.response.data.message];
-        } else {
-            errors.value = ['An error occurred during registration. Please try again.'];
-        }
-    } finally {
-        loading.value = false;
-    }
+    await register(form.value);
 };
 </script>

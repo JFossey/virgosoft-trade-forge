@@ -71,46 +71,16 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { useAuth } from '../composables/useAuth';
 
-const router = useRouter();
+const { errors, loading, login } = useAuth();
 
 const form = ref({
     email: '',
     password: '',
 });
 
-const errors = ref([]);
-const loading = ref(false);
-
 const handleLogin = async () => {
-    errors.value = [];
-    loading.value = true;
-
-    try {
-        // Get CSRF cookie first
-        await axios.get('/sanctum/csrf-cookie');
-
-        // Login user
-        const response = await axios.post('/api/login', form.value);
-
-        if (response.data.user) {
-            // Redirect to home page after successful login
-            router.push('/');
-        }
-    } catch (error) {
-        if (error.response?.data?.errors) {
-            // Laravel validation errors
-            const validationErrors = error.response.data.errors;
-            errors.value = Object.values(validationErrors).flat();
-        } else if (error.response?.data?.message) {
-            errors.value = [error.response.data.message];
-        } else {
-            errors.value = ['An error occurred during login. Please try again.'];
-        }
-    } finally {
-        loading.value = false;
-    }
+    await login(form.value);
 };
 </script>
