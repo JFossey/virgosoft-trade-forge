@@ -7,9 +7,7 @@
                     <!-- Logo and Brand -->
                     <div class="flex items-center">
                         <router-link to="/" class="flex items-center space-x-2">
-                            <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                            </svg>
+                            <HiArrowTrendingUp class="h-8 w-8 text-blue-600" />
                             <span class="text-xl font-bold text-gray-900">Trade Forge</span>
                         </router-link>
                     </div>
@@ -41,5 +39,5 @@
 </template>
 
 <script setup>
-// Layout component with navigation
+import { HiArrowTrendingUp } from 'vue-icons-plus/hi2';
 </script>
