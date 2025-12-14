@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
@@ -6,6 +6,8 @@ export function useAuth() {
     const router = useRouter();
     const errors = ref([]);
     const loading = ref(false);
+    const user = ref(null);
+    const isAuthenticated = computed(() => user.value !== null);
 
     /**
      * Extract and format validation errors from API response
@@ -29,6 +31,25 @@ export function useAuth() {
     };
 
     /**
+     * Fetch the authenticated user from the API
+     */
+    const fetchUser = async () => {
+        try {
+            const response = await axios.get('/api/user');
+            user.value = response.data;
+            return response.data;
+        } catch (error) {
+            // 401 means not authenticated, not an error
+            if (error.response?.status === 401) {
+                user.value = null;
+                return null;
+            }
+            // Other errors (network, server) should be thrown
+            throw error;
+        }
+    };
+
+    /**
      * Make an authenticated API request with CSRF token
      */
     const makeAuthRequest = async (url, data, redirectTo = "/") => {
@@ -43,6 +64,7 @@ export function useAuth() {
             const response = await axios.post(url, data);
 
             if (response.data.user) {
+                user.value = response.data.user;
                 // Redirect on success
                 router.push(redirectTo);
             }
@@ -79,6 +101,7 @@ export function useAuth() {
 
         try {
             await axios.post("/api/logout");
+            user.value = null;
             router.push("/login");
         } catch (error) {
             handleErrors(error);
@@ -88,9 +111,12 @@ export function useAuth() {
     };
 
     return {
+        user,
+        isAuthenticated,
         errors,
         loading,
         clearErrors,
+        fetchUser,
         register,
         login,
         logout,

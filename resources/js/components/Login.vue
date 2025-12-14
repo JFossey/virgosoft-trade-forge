@@ -71,8 +71,10 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 
+const route = useRoute();
 const { errors, loading, login } = useAuth();
 
 const form = ref({
@@ -81,6 +83,7 @@ const form = ref({
 });
 
 const handleLogin = async () => {
-    await login(form.value);
+    const redirectTo = route.query.redirect || '/dashboard';
+    await login(form.value, redirectTo);
 };
 </script>

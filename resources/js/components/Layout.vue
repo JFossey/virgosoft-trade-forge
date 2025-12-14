@@ -14,18 +14,36 @@
 
                     <!-- Navigation Links -->
                     <div class="flex items-center space-x-4">
-                        <router-link
-                            to="/login"
-                            class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                        >
-                            Login
-                        </router-link>
-                        <router-link
-                            to="/register"
-                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
-                        >
-                            Register
-                        </router-link>
+                        <!-- Show when NOT authenticated -->
+                        <template v-if="!isAuthenticated">
+                            <router-link
+                                to="/login"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                            >
+                                Login
+                            </router-link>
+                            <router-link
+                                to="/register"
+                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                            >
+                                Register
+                            </router-link>
+                        </template>
+
+                        <!-- Show when authenticated -->
+                        <template v-else>
+                            <span class="px-3 py-2 text-sm font-medium text-gray-700">
+                                Welcome, {{ user.name }}
+                            </span>
+                            <button
+                                @click="handleLogout"
+                                :disabled="loading"
+                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span v-if="loading">Logging out...</span>
+                                <span v-else>Logout</span>
+                            </button>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -40,4 +58,11 @@
 
 <script setup>
 import { HiArrowTrendingUp } from 'vue-icons-plus/hi2';
+import { useAuth } from '../composables/useAuth';
+
+const { user, isAuthenticated, logout, loading } = useAuth();
+
+const handleLogout = async () => {
+    await logout();
+};
 </script>
