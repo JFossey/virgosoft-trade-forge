@@ -12,14 +12,13 @@ export default defineConfig({
         tailwindcss(),
         vue(),
     ],
+    // Adjust Vites dev server to work with DDEV
+    // https://vitejs.dev/config/server-options.html
     server: {
         watch: {
             ignored: ["**/storage/framework/views/**"],
         },
-    },
-    // Adjust Vites dev server to work with DDEV
-    // https://vitejs.dev/config/server-options.html
-    server: {
+
         // Respond to all network requests
         host: "0.0.0.0",
         port: 5173,
