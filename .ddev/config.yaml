@@ -16,6 +16,11 @@ corepack_enable: false
 performance_mode: none
 disable_settings_management: true
 host_db_port: "33065"
+web_extra_exposed_ports:
+    - name: vite_port
+      container_port: 5173
+      http_port: 5173
+      https_port: 5174
 
 # Key features of DDEV's config.yaml:
 
