@@ -2,12 +2,14 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
+// Shared state - created once and shared across all components
+const errors = ref([]);
+const loading = ref(false);
+const user = ref(null);
+const isAuthenticated = computed(() => user.value !== null);
+
 export function useAuth() {
     const router = useRouter();
-    const errors = ref([]);
-    const loading = ref(false);
-    const user = ref(null);
-    const isAuthenticated = computed(() => user.value !== null);
 
     /**
      * Extract and format validation errors from API response
@@ -36,8 +38,8 @@ export function useAuth() {
     const fetchUser = async () => {
         try {
             const response = await axios.get('/api/user');
-            user.value = response.data;
-            return response.data;
+            user.value = response.data.user; // Extract nested user object
+            return response.data.user;
         } catch (error) {
             // 401 means not authenticated, not an error
             if (error.response?.status === 401) {

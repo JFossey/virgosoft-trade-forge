@@ -32,9 +32,7 @@
 
                         <!-- Show when authenticated -->
                         <template v-else>
-                            <span class="px-3 py-2 text-sm font-medium text-gray-700">
-                                Welcome, {{ user.name }}
-                            </span>
+                            <span class="px-3 py-2 text-sm font-medium text-gray-700"> Welcome, {{ user.name }}</span>
                             <button
                                 @click="handleLogout"
                                 :disabled="loading"
@@ -57,8 +55,8 @@
 </template>
 
 <script setup>
-import { HiArrowTrendingUp } from 'vue-icons-plus/hi2';
-import { useAuth } from '../composables/useAuth';
+import { HiArrowTrendingUp } from "vue-icons-plus/hi2";
+import { useAuth } from "../composables/useAuth";
 
 const { user, isAuthenticated, logout, loading } = useAuth();
 
