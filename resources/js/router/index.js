@@ -40,11 +40,6 @@ const router = createRouter({
 // Global navigation guard
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
-    // Ensure the user state is loaded before proceeding
-    // This is important for initial page load when isAuthenticated might not be ready yet
-    if (authStore.user === null && !authStore.loading) {
-         await authStore.fetchUser();
-    }
     const isAuth = authStore.isAuthenticated;
 
     if (to.meta.requiresAuth && !isAuth) {

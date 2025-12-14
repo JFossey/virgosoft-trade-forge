@@ -56,9 +56,12 @@
 
 <script setup>
 import { HiArrowTrendingUp } from "vue-icons-plus/hi2";
-import { useAuth } from "../composables/useAuth";
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '../store/auth';
 
-const { user, isAuthenticated, logout, loading } = useAuth();
+const authStore = useAuthStore();
+const { user, isAuthenticated, loading } = storeToRefs(authStore);
+const { logout } = authStore;
 
 const handleLogout = async () => {
     await logout();
