@@ -4,6 +4,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
+// Login route - serves SPA (required by auth middleware)
+Route::get("/login", function () {
+    return view("app");
+})->name("login");
+
+// Register route - serves SPA
+Route::get("/register", function () {
+    return view("app");
+})->name("register");
+
 // Backend logout route - performs logout and redirects
 Route::get("/logout", function (Request $request) {
     Auth::guard("web")->logout();
