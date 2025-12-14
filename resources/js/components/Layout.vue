@@ -31,7 +31,7 @@
                         </template>
 
                         <!-- Show when authenticated -->
-                        <template v-else>
+                        <template v-if="isAuthenticated">
                             <span class="px-3 py-2 text-sm font-medium text-gray-700"> Welcome, {{ user.name }}</span>
                             <button
                                 @click="handleLogout"
@@ -56,8 +56,8 @@
 
 <script setup>
 import { HiArrowTrendingUp } from "vue-icons-plus/hi2";
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '../store/auth';
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "../store/auth";
 
 const authStore = useAuthStore();
 const { user, isAuthenticated, loading } = storeToRefs(authStore);

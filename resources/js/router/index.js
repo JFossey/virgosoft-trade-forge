@@ -10,25 +10,26 @@ const routes = [
     {
         path: "/",
         name: "home",
-        component: Home
+        component: Home,
+        meta: { guestOnly: true },
     },
     {
         path: "/login",
         name: "login",
         component: Login,
-        meta: { guestOnly: true }
+        meta: { guestOnly: true },
     },
     {
         path: "/register",
         name: "register",
         component: Register,
-        meta: { guestOnly: true }
+        meta: { guestOnly: true },
     },
     {
         path: "/dashboard",
         name: "dashboard",
         component: Dashboard,
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true },
     },
 ];
 
@@ -42,13 +43,17 @@ router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
     const isAuth = authStore.isAuthenticated;
 
-    if (to.meta.requiresAuth && !isAuth) {
-        next({ name: 'login', query: { redirect: to.fullPath } });
-    } else if (to.meta.guestOnly && isAuth) {
-        next({ name: 'dashboard' });
-    } else {
-        next();
+    if (to.meta.requiresAuth && isAuth === false) {
+        next({ name: "login", query: { redirect: to.fullPath } });
+        return;
     }
+
+    if (to.meta.guestOnly && isAuth === true) {
+        next({ name: "dashboard" });
+        return;
+    }
+
+    next();
 });
 
 export default router;
