@@ -31,8 +31,8 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
                 <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
-                    <div class="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
-                        <span class="text-2xl">₿</span>
+                    <div class="h-12 w-12 flex items-center justify-center">
+                        <SiBitcoin class="w-12 h-12 text-orange-500" />
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Bitcoin</h3>
@@ -40,8 +40,8 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
-                    <div class="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
-                        <span class="text-2xl">Ξ</span>
+                    <div class="h-12 w-12 flex items-center justify-center">
+                        <SiEthereum class="w-12 h-12 text-purple-500" />
                     </div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Ethereum</h3>
@@ -54,5 +54,5 @@
 </template>
 
 <script setup>
-// Placeholder home page component
+import { SiBitcoin, SiEthereum } from 'vue-icons-plus/si';
 </script>
