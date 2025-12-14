@@ -39,21 +39,25 @@ const router = createRouter({
 });
 
 // Global navigation guard
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
     const authStore = useAuthStore();
+
+    // Fetch user if not already loaded
+    if (authStore.user === null) {
+        await authStore.fetchUser();
+    }
+
     const isAuth = authStore.isAuthenticated;
 
-    if (to.meta.requiresAuth && isAuth === false) {
-        next({ name: "login", query: { redirect: to.fullPath } });
-        return;
+    if (to.meta.requiresAuth && !isAuth) {
+        return { name: "login", query: { redirect: to.fullPath } };
     }
 
-    if (to.meta.guestOnly && isAuth === true) {
-        next({ name: "dashboard" });
-        return;
+    if (to.meta.guestOnly && isAuth) {
+        return { name: "dashboard" };
     }
 
-    next();
+    return true;
 });
 
 export default router;
