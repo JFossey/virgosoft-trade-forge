@@ -18,6 +18,7 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "pinia": "^3.0.4",
         "vue": "^3.5.25",
         "vue-icons-plus": "^0.1.8",
         "vue-router": "^4.6.4"

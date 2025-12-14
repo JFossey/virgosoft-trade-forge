@@ -49,7 +49,7 @@
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span v-if="loading">Signing In...</span>
                         <span v-else>Sign In</span>
@@ -71,8 +71,10 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAuth } from '../composables/useAuth';
 
+const route = useRoute();
 const { errors, loading, login } = useAuth();
 
 const form = ref({
@@ -81,6 +83,7 @@ const form = ref({
 });
 
 const handleLogin = async () => {
-    await login(form.value);
+    const redirectTo = route.query.redirect || { name: 'dashboard' };
+    await login(form.value, redirectTo);
 };
 </script>

@@ -1,96 +1,54 @@
-import { ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import { useAuthStore } from "../store/auth";
 
 export function useAuth() {
     const router = useRouter();
-    const errors = ref([]);
-    const loading = ref(false);
+    const authStore = useAuthStore();
 
-    /**
-     * Extract and format validation errors from API response
-     */
-    const handleErrors = (error) => {
-        // Laravel validation errors
-        if (error.response?.data?.errors) {
-            const validationErrors = error.response.data.errors;
-            errors.value = Object.values(validationErrors).flat();
-            return;
-        }
+    // Expose state and getters from the store
+    const user = authStore.user;
+    const isAuthenticated = authStore.isAuthenticated;
+    const loading = authStore.loading;
+    const errors = authStore.errors;
 
-        errors.value = ["An unexpected error occurred. Please try again."];
-    };
+    const clearErrors = authStore.clearErrors;
 
-    /**
-     * Clear all errors
-     */
-    const clearErrors = () => {
-        errors.value = [];
-    };
+    const fetchUser = authStore.fetchUser;
 
-    /**
-     * Make an authenticated API request with CSRF token
-     */
-    const makeAuthRequest = async (url, data, redirectTo = "/") => {
-        clearErrors();
-        loading.value = true;
-
+    const register = async (formData) => {
         try {
-            // Get CSRF cookie first
-            await axios.get("/sanctum/csrf-cookie");
-
-            // Make the API request
-            const response = await axios.post(url, data);
-
-            if (response.data.user) {
-                // Redirect on success
-                router.push(redirectTo);
-            }
-
-            return response;
+            await authStore.register(formData);
+            router.push({ name: "dashboard" });
         } catch (error) {
-            handleErrors(error);
-            throw error;
-        } finally {
-            loading.value = false;
+            // Errors are handled by the store
         }
     };
 
-    /**
-     * Register a new user
-     */
-    const register = async (formData, redirectTo = "/") => {
-        return makeAuthRequest("/api/register", formData, redirectTo);
+    const login = async (formData) => {
+        try {
+            await authStore.login(formData);
+            router.push({ name: "dashboard" });
+        } catch (error) {
+            // Errors are handled by the store
+        }
     };
 
-    /**
-     * Login a user
-     */
-    const login = async (formData, redirectTo = "/") => {
-        return makeAuthRequest("/api/login", formData, redirectTo);
-    };
-
-    /**
-     * Logout the current user
-     */
     const logout = async () => {
-        clearErrors();
-        loading.value = true;
-
         try {
-            await axios.post("/api/logout");
-            router.push("/login");
+            await authStore.logout();
+            router.push({ name: "login" });
         } catch (error) {
-            handleErrors(error);
-        } finally {
-            loading.value = false;
+            // Errors are handled by the store
         }
     };
 
     return {
+        user,
+        isAuthenticated,
         errors,
         loading,
         clearErrors,
+        fetchUser,
         register,
         login,
         logout,

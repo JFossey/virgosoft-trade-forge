@@ -11,13 +11,13 @@
             <div class="flex justify-center space-x-4">
                 <router-link
                     to="/register"
-                    class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                 >
                     Get Started
                 </router-link>
                 <router-link
                     to="/login"
-                    class="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+                    class="px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors cursor-pointer"
                 >
                     Sign In
                 </router-link>

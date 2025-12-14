@@ -2,20 +2,8 @@
     <div class="space-y-6">
         <!-- Dashboard Header -->
         <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-                    <p class="mt-2 text-gray-600">Welcome to Trade Forge</p>
-                </div>
-                <button
-                    @click="handleLogout"
-                    :disabled="loading"
-                    class="px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <span v-if="loading">Logging out...</span>
-                    <span v-else>Logout</span>
-                </button>
-            </div>
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p class="mt-2 text-gray-600">Welcome to Trade Forge</p>
         </div>
 
         <!-- Stats Grid -->
@@ -66,10 +54,10 @@
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                <button class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
                     Create Buy Order
                 </button>
-                <button class="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors">
+                <button class="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors cursor-pointer">
                     Create Sell Order
                 </button>
             </div>
@@ -87,11 +75,4 @@
 
 <script setup>
 import { SiBitcoin, SiEthereum } from 'vue-icons-plus/si';
-import { useAuth } from '../composables/useAuth';
-
-const { loading, logout } = useAuth();
-
-const handleLogout = async () => {
-    await logout();
-};
 </script>
