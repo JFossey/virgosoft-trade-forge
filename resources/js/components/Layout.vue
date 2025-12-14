@@ -36,7 +36,7 @@
                             <button
                                 @click="handleLogout"
                                 :disabled="loading"
-                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <span v-if="loading">Logging out...</span>
                                 <span v-else>Logout</span>
