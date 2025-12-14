@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import axios from "axios";
+import { useAuthStore } from "../store/auth"; // Import the Pinia store
+
 import Home from "../components/Home.vue";
 import Login from "../components/Login.vue";
 import Register from "../components/Register.vue";
@@ -14,12 +15,14 @@ const routes = [
     {
         path: "/login",
         name: "login",
-        component: Login
+        component: Login,
+        meta: { guestOnly: true }
     },
     {
         path: "/register",
         name: "register",
-        component: Register
+        component: Register,
+        meta: { guestOnly: true }
     },
     {
         path: "/dashboard",
@@ -34,29 +37,21 @@ const router = createRouter({
     routes,
 });
 
-// Global navigation guard for authentication
+// Global navigation guard
 router.beforeEach(async (to, from, next) => {
-    // Check if route requires authentication
-    if (to.meta.requiresAuth) {
-        try {
-            // Verify user is authenticated
-            await axios.get('/api/user');
-            next(); // Allow navigation
-        } catch (error) {
-            // Not authenticated - redirect to login
-            if (error.response?.status === 401) {
-                next({
-                    name: 'login',
-                    query: { redirect: to.fullPath }
-                });
-            } else {
-                // Network error - allow through, let component handle
-                console.error('Auth check failed:', error);
-                next();
-            }
-        }
+    const authStore = useAuthStore();
+    // Ensure the user state is loaded before proceeding
+    // This is important for initial page load when isAuthenticated might not be ready yet
+    if (authStore.user === null && !authStore.loading) {
+         await authStore.fetchUser();
+    }
+    const isAuth = authStore.isAuthenticated;
+
+    if (to.meta.requiresAuth && !isAuth) {
+        next({ name: 'login', query: { redirect: to.fullPath } });
+    } else if (to.meta.guestOnly && isAuth) {
+        next({ name: 'dashboard' });
     } else {
-        // Public route - allow navigation
         next();
     }
 });
