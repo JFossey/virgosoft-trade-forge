@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+
 use Illuminate\Support\Facades\Auth;
 
 class PageController extends Controller
@@ -12,11 +14,7 @@ class PageController extends Controller
      */
     public function home()
     {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
-
-        return view('app');
+        return view("app");
     }
 
     /**
@@ -25,7 +23,7 @@ class PageController extends Controller
      */
     public function login()
     {
-        return view('app');
+        return view("app");
     }
 
     /**
@@ -34,7 +32,7 @@ class PageController extends Controller
      */
     public function register()
     {
-        return view('app');
+        return view("app");
     }
 
     /**
@@ -43,7 +41,7 @@ class PageController extends Controller
      */
     public function dashboard()
     {
-        return view('app');
+        return view("app");
     }
 
     /**
@@ -52,10 +50,11 @@ class PageController extends Controller
      */
     public function logout()
     {
-        Auth::guard('web')->logout();
+        Auth::guard("web")->logout();
+
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route("login");
     }
 }
