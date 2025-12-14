@@ -8,22 +8,22 @@ import Dashboard from "../components/Dashboard.vue";
 const routes = [
     {
         path: "/",
-        name: "Home",
+        name: "home",
         component: Home
     },
     {
         path: "/login",
-        name: "Login",
+        name: "login",
         component: Login
     },
     {
         path: "/register",
-        name: "Register",
+        name: "register",
         component: Register
     },
     {
         path: "/dashboard",
-        name: "Dashboard",
+        name: "dashboard",
         component: Dashboard,
         meta: { requiresAuth: true }
     },
@@ -46,7 +46,7 @@ router.beforeEach(async (to, from, next) => {
             // Not authenticated - redirect to login
             if (error.response?.status === 401) {
                 next({
-                    path: '/login',
+                    name: 'login',
                     query: { redirect: to.fullPath }
                 });
             } else {

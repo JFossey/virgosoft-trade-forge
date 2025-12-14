@@ -83,7 +83,7 @@ const form = ref({
 });
 
 const handleLogin = async () => {
-    const redirectTo = route.query.redirect || '/dashboard';
+    const redirectTo = route.query.redirect || { name: 'dashboard' };
     await login(form.value, redirectTo);
 };
 </script>

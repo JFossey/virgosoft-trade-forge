@@ -54,7 +54,7 @@ export function useAuth() {
     /**
      * Make an authenticated API request with CSRF token
      */
-    const makeAuthRequest = async (url, data, redirectTo = "/") => {
+    const makeAuthRequest = async (url, data, redirectTo = { name: "dashboard" }) => {
         clearErrors();
         loading.value = true;
 
@@ -83,14 +83,14 @@ export function useAuth() {
     /**
      * Register a new user
      */
-    const register = async (formData, redirectTo = "/") => {
+    const register = async (formData, redirectTo = { name: "dashboard" }) => {
         return makeAuthRequest("/api/register", formData, redirectTo);
     };
 
     /**
      * Login a user
      */
-    const login = async (formData, redirectTo = "/") => {
+    const login = async (formData, redirectTo = { name: "dashboard" }) => {
         return makeAuthRequest("/api/login", formData, redirectTo);
     };
 
@@ -104,7 +104,7 @@ export function useAuth() {
         try {
             await axios.post("/api/logout");
             user.value = null;
-            router.push("/login");
+            router.push({ name: "login" });
         } catch (error) {
             handleErrors(error);
         } finally {

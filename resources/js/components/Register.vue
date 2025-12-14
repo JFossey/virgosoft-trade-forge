@@ -111,6 +111,6 @@ const form = ref({
 });
 
 const handleRegister = async () => {
-    await register(form.value, '/dashboard');
+    await register(form.value, { name: 'dashboard' });
 };
 </script>

@@ -13,7 +13,7 @@ class PageController extends Controller
     public function home()
     {
         if (Auth::check()) {
-            return redirect('/dashboard');
+            return redirect()->route('dashboard');
         }
 
         return view('app');
@@ -56,6 +56,6 @@ class PageController extends Controller
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }
