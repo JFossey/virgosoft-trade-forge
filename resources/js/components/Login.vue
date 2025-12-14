@@ -9,16 +9,25 @@
                     </p>
                 </div>
 
-                <!-- Placeholder Form -->
-                <form class="space-y-6">
+                <!-- Error Messages -->
+                <div v-if="errors.length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                    <ul class="list-disc list-inside text-sm text-red-600">
+                        <li v-for="error in errors" :key="error">{{ error }}</li>
+                    </ul>
+                </div>
+
+                <!-- Login Form -->
+                <form @submit.prevent="handleLogin" class="space-y-6">
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">
                             Email Address
                         </label>
                         <input
                             id="email"
+                            v-model="form.email"
                             type="email"
                             placeholder="you@example.com"
+                            required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
@@ -29,17 +38,21 @@
                         </label>
                         <input
                             id="password"
+                            v-model="form.password"
                             type="password"
                             placeholder="••••••••"
+                            required
                             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
 
                     <button
                         type="submit"
-                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        :disabled="loading"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Sign In
+                        <span v-if="loading">Signing In...</span>
+                        <span v-else>Sign In</span>
                     </button>
                 </form>
 
@@ -57,5 +70,47 @@
 </template>
 
 <script setup>
-// Placeholder login component
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+
+const router = useRouter();
+
+const form = ref({
+    email: '',
+    password: '',
+});
+
+const errors = ref([]);
+const loading = ref(false);
+
+const handleLogin = async () => {
+    errors.value = [];
+    loading.value = true;
+
+    try {
+        // Get CSRF cookie first
+        await axios.get('/sanctum/csrf-cookie');
+
+        // Login user
+        const response = await axios.post('/api/login', form.value);
+
+        if (response.data.user) {
+            // Redirect to home page after successful login
+            router.push('/');
+        }
+    } catch (error) {
+        if (error.response?.data?.errors) {
+            // Laravel validation errors
+            const validationErrors = error.response.data.errors;
+            errors.value = Object.values(validationErrors).flat();
+        } else if (error.response?.data?.message) {
+            errors.value = [error.response.data.message];
+        } else {
+            errors.value = ['An error occurred during login. Please try again.'];
+        }
+    } finally {
+        loading.value = false;
+    }
+};
 </script>
