@@ -4,13 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_unauthenticated_user_cannot_view_profile(): void
     {
         $response = $this->getJson('/api/profile');

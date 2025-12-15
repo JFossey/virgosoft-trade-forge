@@ -7,13 +7,10 @@ use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class OrderModelTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_order_can_be_created_with_factory(): void
     {
         $order = Order::factory()->create();
