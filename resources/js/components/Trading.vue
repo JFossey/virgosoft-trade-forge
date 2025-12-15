@@ -48,7 +48,3 @@ onUnmounted(() => {
     tradingStore.unsubscribeFromUserChannel();
 });
 </script>
-
-<style scoped>
-/* Add component-specific styles here if needed */
-</style>
