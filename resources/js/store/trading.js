@@ -117,7 +117,10 @@ export const useTradingStore = defineStore('trading', {
             this.publicChannel = window.Echo.channel(channelName)
                 .listen('.order.created', () => this.refreshOrderbook())
                 .listen('.order.cancelled', () => this.refreshOrderbook())
-                .listen('.order.matched', () => this.refreshOrderbook());
+                .listen('.order.matched', () => this.refreshOrderbook())
+                .error((error) => {
+                    console.error(`Failed to subscribe to ${channelName}:`, error);
+                });
         },
 
         subscribeToUserChannel() {
@@ -152,6 +155,9 @@ export const useTradingStore = defineStore('trading', {
                     toast.info(`Your ${order.side} order #${order.id} was cancelled.`);
                     this.fetchProfile();
                     this.refreshOrderbook();
+                })
+                .error((error) => {
+                    console.error(`Failed to subscribe to private channel ${channelName}:`, error);
                 });
         },
 
