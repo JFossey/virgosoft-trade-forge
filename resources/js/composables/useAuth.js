@@ -1,15 +1,13 @@
 import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 import { useAuthStore } from "../store/auth";
 
 export function useAuth() {
     const router = useRouter();
     const authStore = useAuthStore();
 
-    // Expose state and getters from the store
-    const user = authStore.user;
-    const isAuthenticated = authStore.isAuthenticated;
-    const loading = authStore.loading;
-    const errors = authStore.errors;
+    // Expose state and getters from the store as reactive refs
+    const { user, isAuthenticated, loading, errors } = storeToRefs(authStore);
 
     const clearErrors = authStore.clearErrors;
 
