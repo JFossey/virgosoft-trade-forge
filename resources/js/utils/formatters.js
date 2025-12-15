@@ -1,9 +1,9 @@
 // virgosoft-trade-forge/resources/js/utils/formatters.js
 
 export function formatCurrency(value, currency = 'USD') {
-    if (value === null || value === undefined) return '';
+    if (value === null || value === undefined) return '0.00'; // Return '0.00' for null/undefined
     const number = parseFloat(value);
-    if (isNaN(number)) return '';
+    if (isNaN(number)) return '0.00'; // Return '0.00' if not a valid number
     return number.toLocaleString('en-US', {
         style: 'decimal',
         minimumFractionDigits: 2,
