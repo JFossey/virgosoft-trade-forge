@@ -15,9 +15,6 @@ class OrderMatchingService
 {
     /**
      * Attempt to match an order.
-     *
-     * @param  Order  $newOrder
-     * @return Trade|null
      */
     public function attemptMatch(Order $newOrder): ?Trade
     {
@@ -30,9 +27,6 @@ class OrderMatchingService
 
     /**
      * Match a buy order with a sell order.
-     *
-     * @param  Order  $buyOrder
-     * @return Trade|null
      */
     private function matchBuyOrder(Order $buyOrder): ?Trade
     {
@@ -57,9 +51,6 @@ class OrderMatchingService
 
     /**
      * Match a sell order with a buy order.
-     *
-     * @param  Order  $sellOrder
-     * @return Trade|null
      */
     private function matchSellOrder(Order $sellOrder): ?Trade
     {
@@ -84,10 +75,6 @@ class OrderMatchingService
 
     /**
      * Execute a trade between buy and sell orders.
-     *
-     * @param  Order  $buyOrder
-     * @param  Order  $sellOrder
-     * @return Trade
      */
     private function executeTrade(Order $buyOrder, Order $sellOrder): Trade
     {
@@ -115,7 +102,7 @@ class OrderMatchingService
 
             if (! $buyerAsset) {
                 // Create new asset without mass assignment
-                $buyerAsset = new Asset();
+                $buyerAsset = new Asset;
                 $buyerAsset->user_id = $buyer->id;
                 $buyerAsset->symbol = $buyOrder->symbol;
                 $buyerAsset->amount = '0.00000000';
@@ -149,7 +136,7 @@ class OrderMatchingService
             $sellOrder->save();
 
             // 7. Create trade record
-            $trade = new Trade();
+            $trade = new Trade;
             $trade->buy_order_id = $buyOrder->id;
             $trade->sell_order_id = $sellOrder->id;
             $trade->buyer_id = $buyer->id;

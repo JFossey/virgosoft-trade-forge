@@ -20,9 +20,6 @@ class OrderService
     /**
      * Create a buy order.
      *
-     * @param  User  $user
-     * @param  array  $data
-     * @return Order
      *
      * @throws InsufficientBalanceException
      */
@@ -48,7 +45,7 @@ class OrderService
             $user->save();
 
             // Create order
-            $order = new Order();
+            $order = new Order;
             $order->user_id = $user->id;
             $order->symbol = AssetSymbol::from($data['symbol']);
             $order->side = OrderSide::BUY;
@@ -64,9 +61,6 @@ class OrderService
     /**
      * Create a sell order.
      *
-     * @param  User  $user
-     * @param  array  $data
-     * @return Order
      *
      * @throws InsufficientAssetsException
      */
@@ -93,7 +87,7 @@ class OrderService
             $asset->save();
 
             // Create order
-            $order = new Order();
+            $order = new Order;
             $order->user_id = $user->id;
             $order->symbol = AssetSymbol::from($data['symbol']);
             $order->side = OrderSide::SELL;
@@ -109,9 +103,6 @@ class OrderService
     /**
      * Cancel an order.
      *
-     * @param  User  $user
-     * @param  int  $orderId
-     * @return Order
      *
      * @throws OrderNotFoundException
      * @throws UnauthorizedOrderAccessException
@@ -127,12 +118,12 @@ class OrderService
 
             // Validate order exists
             if (! $order) {
-                throw new OrderNotFoundException();
+                throw new OrderNotFoundException;
             }
 
             // Validate ownership
             if ($order->user_id !== $user->id) {
-                throw new UnauthorizedOrderAccessException();
+                throw new UnauthorizedOrderAccessException;
             }
 
             // Validate status is OPEN
