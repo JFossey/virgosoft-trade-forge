@@ -1,11 +1,11 @@
 <?php
 
-namespace App\DataTransferObjects;
+namespace App\Values;
 
 use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 
-readonly class CreateOrderData
+readonly class CreateOrderValue
 {
     public function __construct(
         public AssetSymbol $symbol,

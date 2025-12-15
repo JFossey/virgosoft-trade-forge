@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\CreateOrderData;
+use App\Values\CreateOrderValue;
 use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
@@ -84,7 +84,7 @@ class OrderService
     /**
      * Create an order (buy or sell).
      */
-    public function createOrder(User $user, CreateOrderData $orderData): Order
+    public function createOrder(User $user, CreateOrderValue $orderData): Order
     {
         return DB::transaction(function () use ($user, $orderData) {
             if ($orderData->side === OrderSide::BUY) {
@@ -112,7 +112,7 @@ class OrderService
     /**
      * Lock user and validate sufficient balance for buy order.
      */
-    protected function lockAndValidateBalance(User $user, CreateOrderData $orderData): void
+    protected function lockAndValidateBalance(User $user, CreateOrderValue $orderData): void
     {
         $user = User::where('id', $user->id)->lockForUpdate()->first();
         $requiredBalance = bcmul($orderData->price, $orderData->amount, 8);
@@ -131,7 +131,7 @@ class OrderService
     /**
      * Lock asset and validate sufficient amount for sell order.
      */
-    protected function lockAndValidateAsset(User $user, CreateOrderData $orderData): void
+    protected function lockAndValidateAsset(User $user, CreateOrderValue $orderData): void
     {
         $asset = Asset::where('user_id', $user->id)
             ->where('symbol', $orderData->symbol->value)
