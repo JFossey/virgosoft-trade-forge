@@ -71,37 +71,38 @@ class OrderController extends Controller
         $user = $request->user();
 
         // Create order (locks funds/assets)
-        // Exceptions bubble up and are handled by Laravel's exception handler
         if ($validated['side'] === 'buy') {
             $order = $this->orderService->createBuyOrder($user, $validated);
-        } else {
+        }
+
+        if ($validated['side'] === 'sell') {
             $order = $this->orderService->createSellOrder($user, $validated);
         }
 
         // Attempt immediate matching
         $trade = $this->matchingService->attemptMatch($order);
 
-        if ($trade) {
-            // Order was matched immediately
-            return response()->json([
-                'message' => 'Order matched successfully',
-                'trade' => [
-                    'buyer_id' => $trade->buyer_id,
-                    'seller_id' => $trade->seller_id,
-                    'symbol' => $trade->symbol->value,
-                    'price' => $trade->price,
-                    'amount' => $trade->amount,
-                    'total_value' => $trade->total_value,
-                    'commission' => $trade->commission,
-                ],
-            ], 200);
-        } else {
+        if ($trade === null) {
             // Order placed in orderbook
             return response()->json([
                 'message' => 'Order placed successfully',
                 'order' => new OrderResource($order->fresh()),
             ], 201);
         }
+
+        // Order was matched immediately
+        return response()->json([
+            'message' => 'Order matched successfully',
+            'trade' => [
+                'buyer_id' => $trade->buyer_id,
+                'seller_id' => $trade->seller_id,
+                'symbol' => $trade->symbol->value,
+                'price' => $trade->price,
+                'amount' => $trade->amount,
+                'total_value' => $trade->total_value,
+                'commission' => $trade->commission,
+            ],
+        ], 200);
     }
 
     /**
