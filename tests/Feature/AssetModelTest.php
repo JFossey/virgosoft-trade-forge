@@ -57,7 +57,7 @@ class AssetModelTest extends TestCase
     public function test_asset_has_correct_default_values(): void
     {
         $user = User::factory()->create();
-        $asset = new Asset();
+        $asset = new Asset;
         $asset->user_id = $user->id;
         $asset->symbol = AssetSymbol::BTC;
         $asset->save();
