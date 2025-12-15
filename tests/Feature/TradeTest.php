@@ -6,13 +6,10 @@ use App\Enums\AssetSymbol;
 use App\Models\Order;
 use App\Models\Trade;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class TradeTest extends TestCase
 {
-    use RefreshDatabase;
-
     /**
      * Test that a trade can be created and has the correct relationships.
      */

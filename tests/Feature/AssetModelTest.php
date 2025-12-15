@@ -6,13 +6,10 @@ use App\Enums\AssetSymbol;
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AssetModelTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_asset_can_be_created_with_factory(): void
     {
         $asset = Asset::factory()->create();

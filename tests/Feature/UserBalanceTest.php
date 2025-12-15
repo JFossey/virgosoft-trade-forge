@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class UserBalanceTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_balance_decimal_precision_is_maintained(): void
     {
         // Create a user with a precise balance value (without mass assignment)
