@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-        <!-- Left: Icon + Details -->
+        <!-- Left: Icons + Details -->
         <div class="flex items-center space-x-4">
             <!-- Activity Icon -->
             <div :class="iconContainerClass">
@@ -15,6 +15,12 @@
                 </svg>
             </div>
 
+            <!-- Currency Icon -->
+            <div :class="currencyIconClass">
+                <SiBitcoin v-if="activity.symbol === 'BTC'" class="h-5 w-5" />
+                <SiEthereum v-else class="h-5 w-5" />
+            </div>
+
             <!-- Activity Details -->
             <div>
                 <div class="flex items-center space-x-2">
@@ -22,10 +28,10 @@
                         {{ activityLabel }}
                     </span>
                     <span class="text-gray-600">·</span>
-                    <span :class="sideClass" class="font-medium text-sm uppercase">
+                    <span v-if="activity.side !== 'trade'" :class="sideClass" class="font-medium text-sm uppercase">
                         {{ activity.side }}
                     </span>
-                    <span class="text-gray-600">·</span>
+                    <span v-if="activity.side !== 'trade'" class="text-gray-600">·</span>
                     <span class="font-medium text-gray-900">{{ activity.symbol }}</span>
                 </div>
                 <div class="text-sm text-gray-500 mt-1">
@@ -48,6 +54,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { SiBitcoin, SiEthereum } from 'vue-icons-plus/si';
 import { formatCurrency, formatCrypto } from '../utils/formatters';
 
 const props = defineProps({
@@ -87,6 +94,10 @@ const activityLabelClass = computed(() => {
 
 const sideClass = computed(() => {
     return props.activity.side === 'buy' ? 'text-green-600' : 'text-red-600';
+});
+
+const currencyIconClass = computed(() => {
+    return 'h-10 w-10 rounded-full flex items-center justify-center bg-gray-100 text-gray-600';
 });
 
 const timeAgo = computed(() => {

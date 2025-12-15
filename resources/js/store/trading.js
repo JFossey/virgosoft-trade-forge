@@ -146,18 +146,6 @@ export const useTradingStore = defineStore('trading', {
                         return;
                     }
                     toast.success(`Order created! ${order.side.toUpperCase()} ${order.amount} ${order.symbol} at ${order.price} USD`);
-
-                    // Add order creation to activity feed
-                    this.addActivityItem({
-                        id: `order-${order.id}`,
-                        activity_type: 'order_created',
-                        symbol: order.symbol,
-                        side: order.side,
-                        price: order.price,
-                        amount: order.amount,
-                        total_value: (parseFloat(order.price) * parseFloat(order.amount)).toFixed(8),
-                        timestamp: order.created_at,
-                    });
                 })
                 .listen('.order.matched', (event) => {
                     const trade = event?.trade;
@@ -168,19 +156,6 @@ export const useTradingStore = defineStore('trading', {
                     toast.success(`Trade Matched! ${trade.amount} ${trade.symbol} at ${trade.price} USD`);
                     this.fetchProfile();
                     this.refreshOrderbook();
-
-                    // Add trade to activity feed
-                    this.addActivityItem({
-                        id: `trade-${trade.id}`,
-                        activity_type: 'trade',
-                        symbol: trade.symbol,
-                        side: trade.buyer_id === this.profile.user_id ? 'buy' : 'sell',
-                        price: trade.price,
-                        amount: trade.amount,
-                        total_value: trade.total_value,
-                        commission: trade.commission,
-                        timestamp: trade.created_at,
-                    });
                 })
                 .listen('.order.cancelled', (event) => {
                     const order = event?.order;
@@ -191,18 +166,6 @@ export const useTradingStore = defineStore('trading', {
                     toast.info(`Your ${order.side} order #${order.id} was cancelled.`);
                     this.fetchProfile();
                     this.refreshOrderbook();
-
-                    // Add cancelled order to activity feed
-                    this.addActivityItem({
-                        id: `order-${order.id}`,
-                        activity_type: 'order_cancelled',
-                        symbol: order.symbol,
-                        side: order.side,
-                        price: order.price,
-                        amount: order.amount,
-                        total_value: (parseFloat(order.price) * parseFloat(order.amount)).toFixed(8),
-                        timestamp: order.created_at,
-                    });
                 })
                 .error((error) => {
                     console.error(`Failed to subscribe to private channel ${channelName}:`, error);
@@ -267,6 +230,13 @@ export const useTradingStore = defineStore('trading', {
         },
 
         addActivityItem(item) {
+            // Check if this item already exists (prevent duplicates)
+            const existingIndex = this.recentActivity.findIndex(activity => activity.id === item.id);
+            if (existingIndex !== -1) {
+                // Already exists, don't add again
+                return;
+            }
+
             // Prepend to beginning (most recent first)
             this.recentActivity.unshift(item);
 

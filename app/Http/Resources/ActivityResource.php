@@ -35,7 +35,7 @@ class ActivityResource extends JsonResource
             'id' => "trade-{$this->id}",
             'activity_type' => 'trade',
             'symbol' => $this->symbol->value,
-            'side' => $this->buyer_id === $request->user()->id ? 'buy' : 'sell',
+            'side' => 'trade', // Platform-wide view, not user-specific
             'price' => $this->price,
             'amount' => $this->amount,
             'total_value' => $this->total_value,
@@ -50,10 +50,12 @@ class ActivityResource extends JsonResource
     private function transformOrder(Request $request): array
     {
         $isCancelled = $this->status === OrderStatus::CANCELLED;
+        $activityType = $isCancelled ? 'order_cancelled' : 'order_created';
+        $idPrefix = $isCancelled ? 'order-cancelled' : 'order-created';
 
         return [
-            'id' => "order-{$this->id}",
-            'activity_type' => $isCancelled ? 'order_cancelled' : 'order_created',
+            'id' => "{$idPrefix}-{$this->id}",
+            'activity_type' => $activityType,
             'symbol' => $this->symbol->value,
             'side' => $this->side->value,
             'price' => $this->price,

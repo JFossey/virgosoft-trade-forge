@@ -12,21 +12,16 @@ use Illuminate\Support\Collection;
 class ActivityController extends Controller
 {
     /**
-     * Get recent activity for the authenticated user.
+     * Get recent activity for all users on the platform.
      *
-     * Returns trades, order creations, and order cancellations from the last 5 minutes.
+     * Returns trades, order creations, and order cancellations from the last 15 minutes.
      */
     public function index(Request $request)
     {
-        $user = $request->user();
-        $fiveMinutesAgo = now()->subMinutes(5);
+        $fifteenMinutesAgo = now()->subMinutes(15);
 
-        // Get trades where user is buyer or seller
-        $trades = Trade::where(function ($query) use ($user) {
-            $query->where('buyer_id', $user->id)
-                ->orWhere('seller_id', $user->id);
-        })
-            ->where('created_at', '>=', $fiveMinutesAgo)
+        // Get all trades from last 15 minutes
+        $trades = Trade::where('created_at', '>=', $fifteenMinutesAgo)
             ->get()
             ->map(fn ($trade) => [
                 'type' => 'trade',
@@ -35,9 +30,8 @@ class ActivityController extends Controller
             ]);
 
         // Get newly created orders (OPEN status)
-        $orderCreations = Order::where('user_id', $user->id)
-            ->where('status', OrderStatus::OPEN)
-            ->where('created_at', '>=', $fiveMinutesAgo)
+        $orderCreations = Order::where('status', OrderStatus::OPEN)
+            ->where('created_at', '>=', $fifteenMinutesAgo)
             ->get()
             ->map(fn ($order) => [
                 'type' => 'order_created',
@@ -46,9 +40,8 @@ class ActivityController extends Controller
             ]);
 
         // Get cancelled orders (CANCELLED status)
-        $orderCancellations = Order::where('user_id', $user->id)
-            ->where('status', OrderStatus::CANCELLED)
-            ->where('updated_at', '>=', $fiveMinutesAgo)
+        $orderCancellations = Order::where('status', OrderStatus::CANCELLED)
+            ->where('updated_at', '>=', $fifteenMinutesAgo)
             ->get()
             ->map(fn ($order) => [
                 'type' => 'order_cancelled',
