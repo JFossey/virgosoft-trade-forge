@@ -16,30 +16,18 @@ export function useAuth() {
     const fetchUser = authStore.fetchUser;
 
     const register = async (formData) => {
-        try {
-            await authStore.register(formData);
-            router.push({ name: "dashboard" });
-        } catch (error) {
-            // Errors are handled by the store
-        }
+        await authStore.register(formData);
+        router.push({ name: "dashboard" });
     };
 
     const login = async (formData) => {
-        try {
-            await authStore.login(formData);
-            router.push({ name: "dashboard" });
-        } catch (error) {
-            // Errors are handled by the store
-        }
+        await authStore.login(formData);
+        router.push({ name: "dashboard" });
     };
 
     const logout = async () => {
-        try {
-            await authStore.logout();
-            router.push({ name: "login" });
-        } catch (error) {
-            // Errors are handled by the store
-        }
+        await authStore.logout();
+        router.push({ name: "login" });
     };
 
     return {
