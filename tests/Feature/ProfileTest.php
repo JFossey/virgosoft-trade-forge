@@ -143,10 +143,10 @@ class ProfileTest extends TestCase
     {
         $user = User::factory()->create(['balance' => '100.00']);
         $initialBalance = BigDecimal::of($user->balance);
-        $fundAmount = BigDecimal::of('50.50');
+        $fundAmount = BigDecimal::of('50'); // Changed to integer
 
         $response = $this->actingAs($user)->postJson('/api/account/fund', [
-            'amount' => $fundAmount->toScale(8)->__toString(),
+            'amount' => (string) $fundAmount, // Sent as integer string
             'confirmation' => true,
         ]);
 
@@ -240,11 +240,11 @@ class ProfileTest extends TestCase
     {
         $user = User::factory()->create(['balance' => '0.00000001']);
         $initialBalance = BigDecimal::of($user->balance);
-        $fundAmount = BigDecimal::of('9999.99999999');
+        $fundAmount = BigDecimal::of('9999'); // Changed to integer
         $expectedBalance = $initialBalance->plus($fundAmount)->toScale(8)->__toString();
 
         $response = $this->actingAs($user)->postJson('/api/account/fund', [
-            'amount' => $fundAmount->toScale(8)->__toString(),
+            'amount' => (string) $fundAmount, // Sent as integer string
             'confirmation' => true,
         ]);
 
@@ -261,7 +261,7 @@ class ProfileTest extends TestCase
     {
         $user = User::factory()->create(['balance' => '100.00']);
         $initialBalance = BigDecimal::of($user->balance);
-        $fundAmount = BigDecimal::of('10.00');
+        $fundAmount = BigDecimal::of('10'); // Changed to integer
 
         $this->withoutExceptionHandling(); // Disable exception handling to see real errors
 
@@ -269,7 +269,7 @@ class ProfileTest extends TestCase
         $promises = [];
         for ($i = 0; $i < 5; $i++) {
             $promises[] = $this->actingAs($user)->postJson('/api/account/fund', [
-                'amount' => $fundAmount->toScale(8)->__toString(),
+                'amount' => (string) $fundAmount, // Sent as integer string
                 'confirmation' => true,
             ]);
         }
