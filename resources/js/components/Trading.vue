@@ -47,6 +47,6 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-    tradingStore.unsubscribeFromUserChannel();
+    tradingStore.unsubscribeAllChannels();
 });
 </script>

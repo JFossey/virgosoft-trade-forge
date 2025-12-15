@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
+use App\Events\OrderCancelled;
+use App\Events\OrderCreated;
 use App\Exceptions\InsufficientAssetsException;
 use App\Exceptions\InsufficientBalanceException;
 use App\Exceptions\OrderCannotBeCancelledException;
@@ -76,6 +78,9 @@ class OrderService
             $order->status = OrderStatus::CANCELLED;
             $order->save();
 
+            // Broadcast order cancelled event
+            broadcast(new OrderCancelled($order));
+
             return $order;
         });
     }
@@ -103,6 +108,9 @@ class OrderService
             $order->amount = $orderData->amount;
             $order->status = OrderStatus::OPEN;
             $order->save();
+
+            // Broadcast order created event
+            broadcast(new OrderCreated($order));
 
             return $order;
         });
