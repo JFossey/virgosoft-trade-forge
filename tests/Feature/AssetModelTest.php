@@ -5,7 +5,10 @@ namespace Tests\Feature;
 use App\Enums\AssetSymbol;
 use App\Models\Asset;
 use App\Models\User;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Database\QueryException;
+
 use Tests\TestCase;
 
 class AssetModelTest extends TestCase
@@ -73,7 +76,7 @@ class AssetModelTest extends TestCase
 
         Asset::factory()->for($user)->symbol(AssetSymbol::BTC)->create();
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
 
         Asset::factory()->for($user)->symbol(AssetSymbol::BTC)->create();
     }

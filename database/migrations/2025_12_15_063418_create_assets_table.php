@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')
+            $table
+                ->foreignId('user_id')
                 ->constrained()
                 ->onDelete('cascade');
             $table->string('symbol', 10);
-            $table->decimal('amount', 20, 8)
+            $table
+                ->decimal('amount', 20, 8)
                 ->default('0.00000000');
-            $table->decimal('locked_amount', 20, 8)
+            $table
+                ->decimal('locked_amount', 20, 8)
                 ->default('0.00000000');
             $table->timestamps();
 
