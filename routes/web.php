@@ -24,7 +24,7 @@ Route::get('/dashboard', [PageController::class, 'dashboard'])
     ->name('dashboard');
 
 // Trade route - requires authentication
-Route::get('/trade', [PageController::class, 'index'])
+Route::get('/trade', [PageController::class, 'trade'])
     ->middleware('auth')
     ->name('trade');
 

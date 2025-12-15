@@ -57,9 +57,10 @@ class PageController extends Controller
     }
 
     /**
-     * Serve the main SPA view for unmatched frontend routes.
+     * Backend trade route
+     * Uses auth middleware to protect this route
      */
-    public function index()
+    public function trade()
     {
         return view('app');
     }

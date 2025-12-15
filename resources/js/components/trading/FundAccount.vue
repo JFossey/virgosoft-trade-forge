@@ -67,11 +67,11 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useTradingStore } from '../../store/trading';
-import { useToast } from "vue-toastification"; // Import useToast
+import { useToast } from "vue-toastification";
 
 const tradingStore = useTradingStore();
 const router = useRouter();
-const toast = useToast(); // Initialize useToast
+const toast = useToast();
 
 const form = ref({
     amount: 0,
@@ -93,9 +93,10 @@ const submitForm = async () => {
             confirmation: form.value.confirmation,
         });
 
-        toast.success(response.data.message); // Display success as a toast
-        // Optionally update the local balance in the store
-        await tradingStore.fetchProfile(); // Re-fetch profile to update balance
+        toast.success(response.data.message);
+
+        // Re-fetch profile to update balance
+        await tradingStore.fetchProfile();
 
         // Clear form
         form.value.amount = 0;
