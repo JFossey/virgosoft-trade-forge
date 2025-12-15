@@ -1,13 +1,21 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import axios from 'axios';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import axios from "axios";
 
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore("auth", () => {
     const user = ref(null);
     const loading = ref(false);
     const errors = ref([]);
 
     const isAuthenticated = computed(() => user.value !== null);
+
+    const setIsLoading = () => {
+        loading.value = true;
+    };
+
+    const setIsNotLoading = () => {
+        loading.value = false;
+    };
 
     const clearErrors = () => {
         errors.value = [];
@@ -19,13 +27,15 @@ export const useAuthStore = defineStore('auth', () => {
             errors.value = Object.values(validationErrors).flat();
             return;
         }
+
         errors.value = ["An unexpected error occurred. Please try again."];
     };
 
     const fetchUser = async () => {
-        loading.value = true;
+        setIsLoading();
+
         try {
-            const response = await axios.get('/api/user');
+            const response = await axios.get("/api/user");
             user.value = response.data.user;
             return response.data.user;
         } catch (error) {
@@ -35,13 +45,14 @@ export const useAuthStore = defineStore('auth', () => {
             }
             throw error;
         } finally {
-            loading.value = false;
+            setIsNotLoading();
         }
     };
 
     const makeAuthRequest = async (url, data) => {
         clearErrors();
-        loading.value = true;
+        setIsLoading();
+
         try {
             await axios.get("/sanctum/csrf-cookie");
             const response = await axios.post(url, data);
@@ -53,7 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
             handleErrors(error);
             throw error;
         } finally {
-            loading.value = false;
+            setIsNotLoading();
         }
     };
 
@@ -67,7 +78,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     const logout = async () => {
         clearErrors();
-        loading.value = true;
+        setIsLoading();
+
         try {
             await axios.post("/api/logout");
             user.value = null;
@@ -75,7 +87,7 @@ export const useAuthStore = defineStore('auth', () => {
             handleErrors(error);
             throw error;
         } finally {
-            loading.value = false;
+            setIsNotLoading();
         }
     };
 
