@@ -52,4 +52,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Asset::class);
     }
+
+    /**
+     * Get the orders owned by the user.
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }
