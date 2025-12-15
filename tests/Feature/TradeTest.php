@@ -3,11 +3,11 @@
 namespace Tests\Feature;
 
 use App\Enums\AssetSymbol;
+use App\Models\Order;
 use App\Models\Trade;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Models\Order;
-use App\Models\User;
 
 class TradeTest extends TestCase
 {
