@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AssetSymbol;
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,12 +35,12 @@ class AssetModelTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Asset::factory()->for($user)->symbol('BTC')->create();
-        Asset::factory()->for($user)->symbol('ETH')->create();
+        Asset::factory()->for($user)->symbol(AssetSymbol::BTC)->create();
+        Asset::factory()->for($user)->symbol(AssetSymbol::ETH)->create();
 
         $this->assertCount(2, $user->assets);
-        $this->assertTrue($user->assets->contains('symbol', 'BTC'));
-        $this->assertTrue($user->assets->contains('symbol', 'ETH'));
+        $this->assertTrue($user->assets->contains('symbol', AssetSymbol::BTC));
+        $this->assertTrue($user->assets->contains('symbol', AssetSymbol::ETH));
     }
 
     public function test_asset_decimal_precision_is_preserved(): void
@@ -58,7 +59,7 @@ class AssetModelTest extends TestCase
         $user = User::factory()->create();
         $asset = new Asset();
         $asset->user_id = $user->id;
-        $asset->symbol = 'BTC';
+        $asset->symbol = AssetSymbol::BTC;
         $asset->save();
         $asset->refresh();
 
@@ -70,11 +71,11 @@ class AssetModelTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Asset::factory()->for($user)->symbol('BTC')->create();
+        Asset::factory()->for($user)->symbol(AssetSymbol::BTC)->create();
 
         $this->expectException(\Illuminate\Database\QueryException::class);
 
-        Asset::factory()->for($user)->symbol('BTC')->create();
+        Asset::factory()->for($user)->symbol(AssetSymbol::BTC)->create();
     }
 
     public function test_different_users_can_have_same_symbol(): void
@@ -82,12 +83,12 @@ class AssetModelTest extends TestCase
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
 
-        $asset1 = Asset::factory()->for($user1)->symbol('BTC')->create();
-        $asset2 = Asset::factory()->for($user2)->symbol('BTC')->create();
+        $asset1 = Asset::factory()->for($user1)->symbol(AssetSymbol::BTC)->create();
+        $asset2 = Asset::factory()->for($user2)->symbol(AssetSymbol::BTC)->create();
 
         $this->assertNotEquals($asset1->id, $asset2->id);
-        $this->assertEquals('BTC', $asset1->symbol);
-        $this->assertEquals('BTC', $asset2->symbol);
+        $this->assertEquals(AssetSymbol::BTC, $asset1->symbol);
+        $this->assertEquals(AssetSymbol::BTC, $asset2->symbol);
     }
 
     public function test_assets_are_deleted_when_user_is_deleted(): void
@@ -104,11 +105,27 @@ class AssetModelTest extends TestCase
 
     public function test_factory_symbol_method_creates_specific_symbol(): void
     {
-        $btcAsset = Asset::factory()->symbol('BTC')->create();
-        $ethAsset = Asset::factory()->symbol('ETH')->create();
+        $btcAsset = Asset::factory()->symbol(AssetSymbol::BTC)->create();
+        $ethAsset = Asset::factory()->symbol(AssetSymbol::ETH)->create();
 
-        $this->assertEquals('BTC', $btcAsset->symbol);
-        $this->assertEquals('ETH', $ethAsset->symbol);
+        $this->assertEquals(AssetSymbol::BTC, $btcAsset->symbol);
+        $this->assertEquals(AssetSymbol::ETH, $ethAsset->symbol);
+    }
+
+    public function test_factory_symbol_method_accepts_string(): void
+    {
+        $btcAsset = Asset::factory()->symbol('BTC')->create();
+        $ethAsset = Asset::factory()->symbol('eth')->create();
+
+        $this->assertEquals(AssetSymbol::BTC, $btcAsset->symbol);
+        $this->assertEquals(AssetSymbol::ETH, $ethAsset->symbol);
+    }
+
+    public function test_symbol_is_cast_to_enum(): void
+    {
+        $asset = Asset::factory()->create();
+
+        $this->assertInstanceOf(AssetSymbol::class, $asset->symbol);
     }
 
     public function test_factory_with_amount_sets_correct_amount(): void

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AssetSymbol;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,6 +28,7 @@ class Asset extends Model
     protected function casts(): array
     {
         return [
+            'symbol' => AssetSymbol::class,
             'amount' => 'decimal:8',
             'locked_amount' => 'decimal:8',
         ];

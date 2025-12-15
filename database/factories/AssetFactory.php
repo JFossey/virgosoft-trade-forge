@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AssetSymbol;
 use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,7 +21,7 @@ class AssetFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'symbol' => fake()->randomElement(['BTC', 'ETH']),
+            'symbol' => fake()->randomElement(AssetSymbol::cases()),
             'amount' => '1.00000000',
             'locked_amount' => '0.00000000',
         ];
@@ -29,10 +30,14 @@ class AssetFactory extends Factory
     /**
      * Create an asset with a specific symbol.
      */
-    public function symbol(string $symbol): static
+    public function symbol(AssetSymbol|string $symbol): static
     {
+        $enumSymbol = is_string($symbol)
+            ? AssetSymbol::from(strtoupper($symbol))
+            : $symbol;
+
         return $this->state(fn (array $attributes) => [
-            'symbol' => strtoupper($symbol),
+            'symbol' => $enumSymbol,
         ]);
     }
 
