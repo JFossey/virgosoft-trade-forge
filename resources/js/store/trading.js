@@ -48,13 +48,14 @@ export const useTradingStore = defineStore('trading', {
             this.errors.profile = null;
             try {
                 const response = await axios.get('/api/profile');
-                this.profile.usd_balance = response.data.usd_balance;
+                this.profile.usd_balance = response.data.user.balance;
                 this.profile.assets = response.data.assets;
-                this.profile.user_id = response.data.id;
+                this.profile.user_id = response.data.user.id;
+                console.log('Fetched user ID:', this.profile.user_id);
             } catch (error) {
                 this.errors.profile = 'Failed to fetch profile.';
                 toast.error('Failed to fetch profile data.');
-                console.error('Failed to fetch profile:', error);
+                console.error('Failed to fetch profile:', error); // Log the full error object
             } finally {
                 this.loading.profile = false;
             }
