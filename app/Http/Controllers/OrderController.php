@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Values\CreateOrderValue;
 use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
@@ -11,6 +10,7 @@ use App\Http\Resources\TradeResource;
 use App\Models\Order;
 use App\Services\OrderMatchingService;
 use App\Services\OrderService;
+use App\Values\CreateOrderValue;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 

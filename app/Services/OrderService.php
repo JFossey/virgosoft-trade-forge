@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Values\CreateOrderValue;
-use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
 use App\Exceptions\InsufficientAssetsException;
@@ -14,6 +12,7 @@ use App\Exceptions\UnauthorizedOrderAccessException;
 use App\Models\Asset;
 use App\Models\Order;
 use App\Models\User;
+use App\Values\CreateOrderValue;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
