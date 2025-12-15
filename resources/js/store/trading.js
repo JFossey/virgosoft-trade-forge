@@ -134,13 +134,22 @@ export const useTradingStore = defineStore('trading', {
             const channelName = `user.${this.profile.user_id}`;
             this.privateChannel = window.Echo.private(channelName)
                 .listen('.order.matched', (event) => {
-                    const { trade } = event;
+                    const trade = event?.trade;
+                    if (!trade) {
+                        console.error('Invalid trade data received', event);
+                        return;
+                    }
                     toast.success(`Trade Matched! ${trade.amount} ${trade.symbol} at ${trade.price} USD`);
                     this.fetchProfile();
                     this.refreshOrderbook();
                 })
                 .listen('.order.cancelled', (event) => {
-                    toast.info(`Your order #${event.order.id} was cancelled.`);
+                    const order = event?.order;
+                    if (!order) {
+                        console.error('Invalid order data received', event);
+                        return;
+                    }
+                    toast.info(`Your ${order.side} order #${order.id} was cancelled.`);
                     this.fetchProfile();
                     this.refreshOrderbook();
                 });

@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Trade;
+use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderMatched implements ShouldBroadcast
+class OrderCancelled implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -18,7 +18,7 @@ class OrderMatched implements ShouldBroadcast
      * Create a new event instance.
      */
     public function __construct(
-        public Trade $trade
+        public Order $order
     ) {}
 
     /**
@@ -29,9 +29,8 @@ class OrderMatched implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user.'.$this->trade->buyer_id),
-            new PrivateChannel('user.'.$this->trade->seller_id),
-            new Channel('orderbook.'.$this->trade->symbol->value),
+            new Channel('orderbook.'.$this->order->symbol->value),
+            new PrivateChannel('user.'.$this->order->user_id),
         ];
     }
 
@@ -40,7 +39,7 @@ class OrderMatched implements ShouldBroadcast
      */
     public function broadcastAs(): string
     {
-        return 'order.matched';
+        return 'order.cancelled';
     }
 
     /**
@@ -51,16 +50,14 @@ class OrderMatched implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'trade' => [
-                'id' => $this->trade->id,
-                'symbol' => $this->trade->symbol->value,
-                'price' => $this->trade->price,
-                'amount' => $this->trade->amount,
-                'total_value' => $this->trade->total_value,
-                'commission' => $this->trade->commission,
-                'buyer_id' => $this->trade->buyer_id,
-                'seller_id' => $this->trade->seller_id,
-                'created_at' => $this->trade->created_at,
+            'order' => [
+                'id' => $this->order->id,
+                'symbol' => $this->order->symbol->value,
+                'side' => $this->order->side->value,
+                'price' => $this->order->price,
+                'amount' => $this->order->amount,
+                'user_id' => $this->order->user_id,
+                'created_at' => $this->order->created_at,
             ],
         ];
     }
