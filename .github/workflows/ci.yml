@@ -41,5 +41,8 @@ jobs:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
 
+    - name: Execute pint formatting tests
+      run: vendor/bin/pint --test
+
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       run: php artisan test
