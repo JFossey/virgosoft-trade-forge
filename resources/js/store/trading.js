@@ -17,6 +17,7 @@ export const useTradingStore = defineStore('trading', {
             buy_orders: [],
             sell_orders: [],
         },
+        recentActivity: [],
         publicChannel: null,
         privateChannel: null,
         loading: {
@@ -24,12 +25,14 @@ export const useTradingStore = defineStore('trading', {
             orderbook: false,
             createOrder: false,
             cancelOrder: false,
+            activity: false,
         },
         errors: {
             profile: null,
             orderbook: null,
             createOrder: null,
             cancelOrder: null,
+            activity: null,
         },
     }),
 
@@ -136,6 +139,26 @@ export const useTradingStore = defineStore('trading', {
 
             const channelName = `user.${this.profile.user_id}`;
             this.privateChannel = window.Echo.private(channelName)
+                .listen('.order.created', (event) => {
+                    const order = event?.order;
+                    if (!order) {
+                        console.error('Invalid order data received', event);
+                        return;
+                    }
+                    toast.success(`Order created! ${order.side.toUpperCase()} ${order.amount} ${order.symbol} at ${order.price} USD`);
+
+                    // Add order creation to activity feed
+                    this.addActivityItem({
+                        id: `order-${order.id}`,
+                        activity_type: 'order_created',
+                        symbol: order.symbol,
+                        side: order.side,
+                        price: order.price,
+                        amount: order.amount,
+                        total_value: (parseFloat(order.price) * parseFloat(order.amount)).toFixed(8),
+                        timestamp: order.created_at,
+                    });
+                })
                 .listen('.order.matched', (event) => {
                     const trade = event?.trade;
                     if (!trade) {
@@ -145,6 +168,19 @@ export const useTradingStore = defineStore('trading', {
                     toast.success(`Trade Matched! ${trade.amount} ${trade.symbol} at ${trade.price} USD`);
                     this.fetchProfile();
                     this.refreshOrderbook();
+
+                    // Add trade to activity feed
+                    this.addActivityItem({
+                        id: `trade-${trade.id}`,
+                        activity_type: 'trade',
+                        symbol: trade.symbol,
+                        side: trade.buyer_id === this.profile.user_id ? 'buy' : 'sell',
+                        price: trade.price,
+                        amount: trade.amount,
+                        total_value: trade.total_value,
+                        commission: trade.commission,
+                        timestamp: trade.created_at,
+                    });
                 })
                 .listen('.order.cancelled', (event) => {
                     const order = event?.order;
@@ -155,6 +191,18 @@ export const useTradingStore = defineStore('trading', {
                     toast.info(`Your ${order.side} order #${order.id} was cancelled.`);
                     this.fetchProfile();
                     this.refreshOrderbook();
+
+                    // Add cancelled order to activity feed
+                    this.addActivityItem({
+                        id: `order-${order.id}`,
+                        activity_type: 'order_cancelled',
+                        symbol: order.symbol,
+                        side: order.side,
+                        price: order.price,
+                        amount: order.amount,
+                        total_value: (parseFloat(order.price) * parseFloat(order.amount)).toFixed(8),
+                        timestamp: order.created_at,
+                    });
                 })
                 .error((error) => {
                     console.error(`Failed to subscribe to private channel ${channelName}:`, error);
@@ -199,6 +247,32 @@ export const useTradingStore = defineStore('trading', {
                 console.error('Failed to cancel order:', error);
             } finally {
                 this.loading.cancelOrder = false;
+            }
+        },
+
+        async fetchRecentActivity() {
+            this.loading.activity = true;
+            this.errors.activity = null;
+            try {
+                const response = await axios.get('/api/activity');
+                this.recentActivity = response.data.data;
+            } catch (error) {
+                const errMsg = error.response?.data?.message || 'Failed to fetch activity.';
+                this.errors.activity = errMsg;
+                toast.error(errMsg);
+                console.error('Failed to fetch activity:', error);
+            } finally {
+                this.loading.activity = false;
+            }
+        },
+
+        addActivityItem(item) {
+            // Prepend to beginning (most recent first)
+            this.recentActivity.unshift(item);
+
+            // Trim to last 50 items
+            if (this.recentActivity.length > 50) {
+                this.recentActivity = this.recentActivity.slice(0, 50);
             }
         },
     },
