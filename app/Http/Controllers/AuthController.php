@@ -30,10 +30,13 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return response()->json([
-            'user' => $user,
-            'message' => 'Registration successful',
-        ], 201);
+        return response()->json(
+            [
+                'user' => $user,
+                'message' => 'Registration successful',
+            ],
+            201,
+        );
     }
 
     /**
@@ -46,7 +49,7 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials) === false) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
