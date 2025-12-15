@@ -72,25 +72,26 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 import { useTradingStore } from '../../store/trading';
 import { formatCurrency, formatCrypto } from '../../utils/formatters';
 import { useToast } from 'vue-toastification';
+import { validateDecimalPlaces } from '../../utils/validationHelpers';
 
 const tradingStore = useTradingStore();
 const toast = useToast();
 
 const selectedSide = ref('buy'); // 'buy' or 'sell'
 const order = ref({
-    price: null,
-    amount: null,
+    price: '',
+    amount: '',
 });
 const errors = ref({});
 
 // Watch for changes in selectedSymbol to clear form and errors
 watch(() => tradingStore.selectedSymbol, () => {
-    order.value.price = null;
-    order.value.amount = null;
+    order.value.price = '';
+    order.value.amount = '';
     errors.value = {};
 });
 
@@ -101,7 +102,9 @@ const validateForm = () => {
     if (!order.value.price || parseFloat(order.value.price) <= 0) {
         errors.value.price = 'Price must be a positive number.';
         isValid = false;
-    } else if (order.value.price.toString().split('.')[1]?.length > 8) {
+    }
+
+    if (!validateDecimalPlaces(order.value.price)) {
         errors.value.price = 'Price can have a maximum of 8 decimal places.';
         isValid = false;
     }
@@ -109,28 +112,35 @@ const validateForm = () => {
     if (!order.value.amount || parseFloat(order.value.amount) <= 0) {
         errors.value.amount = 'Amount must be a positive number.';
         isValid = false;
-    } else if (order.value.amount.toString().split('.')[1]?.length > 8) {
+    }
+
+    if (!validateDecimalPlaces(order.value.amount)) {
         errors.value.amount = 'Amount can have a maximum of 8 decimal places.';
         isValid = false;
     }
 
-    // Balance check
-    if (isValid) {
-        const price = parseFloat(order.value.price);
-        const amount = parseFloat(order.value.amount);
+    // Return early at this point if false
+    if (isValid === false) {
+        return isValid;
+    }
 
-        if (selectedSide.value === 'buy') {
-            const totalCost = price * amount;
-            if (totalCost > parseFloat(tradingStore.profile.usd_balance)) {
-                errors.value.amount = 'Insufficient USD balance.';
-                isValid = false;
-            }
-        } else { // sell side
-            const availableAssetAmount = tradingStore.getAvailableAssetAmount(tradingStore.selectedSymbol);
-            if (amount > availableAssetAmount) {
-                errors.value.amount = `Insufficient ${tradingStore.selectedSymbol} available.`;
-                isValid = false;
-            }
+    // Balance check
+    const price = parseFloat(order.value.price);
+    const amount = parseFloat(order.value.amount);
+
+    if (selectedSide.value === 'buy') {
+        const totalCost = price * amount;
+        if (totalCost > parseFloat(tradingStore.profile.usd_balance)) {
+            errors.value.amount = 'Insufficient USD balance.';
+            isValid = false;
+        }
+    }
+
+    if (selectedSide.value === 'sell') {
+        const availableAssetAmount = tradingStore.getAvailableAssetAmount(tradingStore.selectedSymbol);
+        if (amount > availableAssetAmount) {
+            errors.value.amount = `Insufficient ${tradingStore.selectedSymbol} available.`;
+            isValid = false;
         }
     }
 
@@ -157,11 +167,14 @@ const submitOrder = async () => {
         const response = await axios.post('/api/orders', orderData);
         if (response.status === 201) {
             toast.success('Order placed successfully!');
-        } else if (response.status === 200) {
+        }
+
+        if (response.status === 200) {
             toast.success('Order matched and executed!');
         }
-        order.value.price = null;
-        order.value.amount = null;
+
+        order.value.price = '';
+        order.value.amount = '';
         errors.value = {}; // Clear any previous errors
 
         // Refresh data after successful order
