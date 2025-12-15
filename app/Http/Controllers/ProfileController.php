@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FundAccountRequest;
 use App\Http\Resources\AssetResource;
-use App\Http\Resources\UserResource;
-use App\Http\Requests\FundAccountRequest; // Import the new request
+use App\Http\Resources\UserResource; // Import the new request
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; // Import DB facade
 

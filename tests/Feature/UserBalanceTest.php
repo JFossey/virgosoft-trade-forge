@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Tests\TestCase;
-use Brick\Math\BigDecimal; // Import BigDecimal
+use Brick\Math\BigDecimal;
+use Tests\TestCase; // Import BigDecimal
 
 class UserBalanceTest extends TestCase
 {

@@ -4,9 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Brick\Math\BigDecimal;
+use Tests\TestCase;
 
 class ProfileTest extends TestCase
 {
@@ -152,13 +151,13 @@ class ProfileTest extends TestCase
         ]);
 
         $response->assertOk()
-                 ->assertJson([
-                     'message' => 'Account funded successfully.',
-                     'user' => [
-                         'id' => $user->id,
-                         'balance' => $initialBalance->plus($fundAmount)->toScale(8)->__toString(),
-                     ],
-                 ]);
+            ->assertJson([
+                'message' => 'Account funded successfully.',
+                'user' => [
+                    'id' => $user->id,
+                    'balance' => $initialBalance->plus($fundAmount)->toScale(8)->__toString(),
+                ],
+            ]);
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
@@ -250,7 +249,7 @@ class ProfileTest extends TestCase
         ]);
 
         $response->assertOk()
-                 ->assertJsonPath('user.balance', $expectedBalance);
+            ->assertJsonPath('user.balance', $expectedBalance);
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
