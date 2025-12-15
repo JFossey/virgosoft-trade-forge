@@ -44,4 +44,12 @@ class User extends Authenticatable
             'balance' => 'decimal:8',
         ];
     }
+
+    /**
+     * Get the assets owned by the user.
+     */
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
 }

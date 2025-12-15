@@ -13,7 +13,7 @@ class UserBalanceTest extends TestCase
     public function test_balance_decimal_precision_is_maintained(): void
     {
         // Create a user with a precise balance value (without mass assignment)
-        $user = new User();
+        $user = new User;
         $user->name = 'Test User';
         $user->email = 'balance.test@example.com';
         $user->password = bcrypt('password');
@@ -52,7 +52,7 @@ class UserBalanceTest extends TestCase
     public function test_balance_defaults_to_zero_with_correct_precision(): void
     {
         // Create a user without specifying balance (without mass assignment)
-        $user = new User();
+        $user = new User;
         $user->name = 'Default Balance User';
         $user->email = 'default.balance@example.com';
         $user->password = bcrypt('password');

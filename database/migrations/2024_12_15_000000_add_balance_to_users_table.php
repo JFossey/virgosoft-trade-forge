@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->decimal('balance', 20, 8)
-                  ->default('0.00000000')
-                  ->after('password');
+                ->default('0.00000000')
+                ->after('password');
         });
     }
 
