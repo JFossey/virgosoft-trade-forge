@@ -155,25 +155,25 @@ class OrderController extends Controller
 
         $trade = $this->matchingService->attemptMatch($order);
 
-        if ($trade) {
-            return response()->json([
-                'message' => 'Order matched successfully',
-                'matched' => true,
-                'trade' => [
-                    'buyer_id' => $trade->buyer_id,
-                    'seller_id' => $trade->seller_id,
-                    'symbol' => $trade->symbol->value,
-                    'price' => $trade->price,
-                    'amount' => $trade->amount,
-                    'total_value' => $trade->total_value,
-                    'commission' => $trade->commission,
-                ],
-            ], 200);
-        } else {
+        if ($trade === null) {
             return response()->json([
                 'message' => 'No matching order found',
                 'matched' => false,
             ], 200);
         }
+
+        return response()->json([
+            'message' => 'Order matched successfully',
+            'matched' => true,
+            'trade' => [
+                'buyer_id' => $trade->buyer_id,
+                'seller_id' => $trade->seller_id,
+                'symbol' => $trade->symbol->value,
+                'price' => $trade->price,
+                'amount' => $trade->amount,
+                'total_value' => $trade->total_value,
+                'commission' => $trade->commission,
+            ],
+        ], 200);
     }
 }

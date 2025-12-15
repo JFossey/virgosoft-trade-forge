@@ -20,9 +20,13 @@ class OrderMatchingService
     {
         if ($newOrder->side === OrderSide::BUY) {
             return $this->matchBuyOrder($newOrder);
-        } else {
+        }
+
+        if ($newOrder->side === OrderSide::SELL) {
             return $this->matchSellOrder($newOrder);
         }
+
+        return null;
     }
 
     /**
@@ -42,7 +46,7 @@ class OrderMatchingService
             ->lockForUpdate()
             ->first();
 
-        if (! $sellOrder) {
+        if ($sellOrder === null) {
             return null; // No match found
         }
 
@@ -66,7 +70,7 @@ class OrderMatchingService
             ->lockForUpdate()
             ->first();
 
-        if (! $buyOrder) {
+        if ($buyOrder === null) {
             return null; // No match found
         }
 
