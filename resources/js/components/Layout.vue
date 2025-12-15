@@ -32,6 +32,12 @@
 
                         <!-- Show when authenticated -->
                         <template v-if="isAuthenticated">
+                            <router-link
+                                to="/trade"
+                                class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                            >
+                                Trade
+                            </router-link>
                             <span class="px-3 py-2 text-sm font-medium text-gray-700"> Welcome, {{ user.name }}</span>
                             <button
                                 @click="handleLogout"

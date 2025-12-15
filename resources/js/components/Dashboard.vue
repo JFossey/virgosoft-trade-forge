@@ -13,7 +13,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">USD Balance</p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900">$0.00</p>
+                        <p v-if="tradingStore.loading.profile" class="mt-2 text-3xl font-bold text-gray-900">Loading...</p>
+                        <p v-else class="mt-2 text-3xl font-bold text-gray-900">${{ formatCurrency(tradingStore.profile.usd_balance) }}</p>
                     </div>
                     <div class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
                         <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -28,7 +29,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">BTC Holdings</p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900">0.00000000</p>
+                        <p v-if="tradingStore.loading.profile" class="mt-2 text-3xl font-bold text-gray-900">Loading...</p>
+                        <p v-else class="mt-2 text-3xl font-bold text-gray-900">{{ formatCrypto(tradingStore.getAsset('BTC')?.amount || 0) }}</p>
                     </div>
                     <div class="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
                         <SiBitcoin class="h-6 w-6 text-orange-500" />
@@ -41,7 +43,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">ETH Holdings</p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900">0.00000000</p>
+                        <p v-if="tradingStore.loading.profile" class="mt-2 text-3xl font-bold text-gray-900">Loading...</p>
+                        <p v-else class="mt-2 text-3xl font-bold text-gray-900">{{ formatCrypto(tradingStore.getAsset('ETH')?.amount || 0) }}</p>
                     </div>
                     <div class="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
                         <SiEthereum class="h-6 w-6 text-purple-500" />
@@ -53,12 +56,12 @@
         <!-- Quick Actions -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer">
-                    Create Buy Order
-                </button>
-                <button class="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors cursor-pointer">
-                    Create Sell Order
+            <div class="grid grid-cols-1 gap-4">
+                <button
+                    @click="navigateToTrade"
+                    class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                >
+                    Create Order
                 </button>
             </div>
         </div>
@@ -74,5 +77,20 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router'; // Import useRouter
 import { SiBitcoin, SiEthereum } from 'vue-icons-plus/si';
+import { useTradingStore } from '../store/trading';
+import { formatCurrency, formatCrypto } from '../utils/formatters';
+
+const tradingStore = useTradingStore();
+const router = useRouter(); // Initialize useRouter
+
+onMounted(async () => {
+    await tradingStore.fetchProfile();
+});
+
+const navigateToTrade = () => {
+    router.push({ name: 'trade' });
+};
 </script>
