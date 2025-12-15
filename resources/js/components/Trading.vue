@@ -1,21 +1,29 @@
 <template>
-    <div class="container mx-auto p-4">
+    <div class="p-4">
         <h1 class="text-3xl font-bold mb-6 text-gray-800 dark:text-white">Trade</h1>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <!-- Balance Summary -->
-            <BalanceSummary />
+            <div class="md:col-span-1">
+                <BalanceSummary class="h-full" />
+            </div>
 
             <!-- Symbol Switcher -->
-            <SymbolSwitcher />
+            <div class="md:col-span-2">
+                <SymbolSwitcher class="h-full" />
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Order Forms -->
-            <OrderForm />
+            <div class="lg:col-span-1">
+                <OrderForm />
+            </div>
 
             <!-- Orderbook -->
-            <Orderbook />
+            <div class="lg:col-span-2">
+                <Orderbook />
+            </div>
         </div>
     </div>
 </template>
