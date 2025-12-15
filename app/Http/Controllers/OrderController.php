@@ -6,6 +6,7 @@ use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\TradeResource;
 use App\Models\Order;
 use App\Services\OrderMatchingService;
 use App\Services\OrderService;
@@ -87,18 +88,10 @@ class OrderController extends Controller
             ], 201);
         }
 
-        // Order was matched immediately
+        // Order placed and matched immediately
         return response()->json([
             'message' => 'Order matched successfully',
-            'trade' => [
-                'buyer_id' => $trade->buyer_id,
-                'seller_id' => $trade->seller_id,
-                'symbol' => $trade->symbol->value,
-                'price' => $trade->price,
-                'amount' => $trade->amount,
-                'total_value' => $trade->total_value,
-                'commission' => $trade->commission,
-            ],
+            'trade' => new TradeResource($trade),
         ], 200);
     }
 
@@ -146,15 +139,7 @@ class OrderController extends Controller
         return response()->json([
             'message' => 'Order matched successfully',
             'matched' => true,
-            'trade' => [
-                'buyer_id' => $trade->buyer_id,
-                'seller_id' => $trade->seller_id,
-                'symbol' => $trade->symbol->value,
-                'price' => $trade->price,
-                'amount' => $trade->amount,
-                'total_value' => $trade->total_value,
-                'commission' => $trade->commission,
-            ],
+            'trade' => new TradeResource($trade),
         ], 200);
     }
 }
