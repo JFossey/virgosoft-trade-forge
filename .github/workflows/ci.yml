@@ -1,48 +1,66 @@
-name: Laravel
+name: Laravel Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  laravel-tests:
-
+  tests:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        php-version: ["8.3"] # Add '8.4' when ready
+
+    name: PHP ${{ matrix.php-version }} tests
+
     steps:
-    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
-      with:
-        php-version: '8.3'
+      - uses: actions/checkout@v4
 
-    - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, pdo_sqlite, bcmath
+          coverage: none
+          tools: composer, php-cs-fixer, pint
 
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-${{ matrix.php-version }}-
 
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      - name: Copy .env
+        run: cp .env.example .env || cp .env.ci .env || true
 
-    - name: Generate key
-      run: php artisan key:generate
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
 
-    - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
+      - name: Prepare Laravel
+        run: |
+          php artisan key:generate
+          mkdir -p storage/logs storage/framework/{cache,sessions,views}
 
-    - name: Create Database
-      run: |
-        mkdir -p database
-        touch database/database.sqlite
+      - name: Set proper permissions
+        run: |
+          chmod -R 775 storage bootstrap/cache
+          find storage bootstrap/cache -type f -exec chmod 664 {} \;
 
-    - name: Run Migrations
-      run: php artisan migrate
-      env:
-        DB_CONNECTION: sqlite
-        DB_DATABASE: database/database.sqlite
+      - name: Check code style (Pint)
+        run: vendor/bin/pint --test -v
 
-    - name: Execute pint formatting tests
-      run: vendor/bin/pint --test
+      - name: Install NPM dependencies & Build assets
+        if: hashFiles('package.json') != ''
+        run: |
+          npm ci
+          npm run build
 
-    - name: Execute tests (Unit and Feature tests) via PHPUnit
-      run: php artisan test
+      - name: Run tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+        run: php artisan test
