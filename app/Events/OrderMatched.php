@@ -18,9 +18,7 @@ class OrderMatched implements ShouldBroadcast
      * Create a new event instance.
      */
     public function __construct(
-        public Trade $trade,
-        public int $buyerId,
-        public int $sellerId
+        public Trade $trade
     ) {}
 
     /**
@@ -31,8 +29,8 @@ class OrderMatched implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('user.'.$this->buyerId),
-            new PrivateChannel('user.'.$this->sellerId),
+            new PrivateChannel('user.'.$this->trade->buyer_id),
+            new PrivateChannel('user.'.$this->trade->seller_id),
         ];
     }
 

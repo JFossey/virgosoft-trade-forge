@@ -519,7 +519,8 @@ class OrderMatchingTest extends TestCase
         ]);
 
         Event::assertDispatched(OrderMatched::class, function ($event) use ($buyer, $seller) {
-            return $event->buyerId === $buyer->id && $event->sellerId === $seller->id;
+            return $event->trade->buyer_id === $buyer->id
+                && $event->trade->seller_id === $seller->id;
         });
     }
 }

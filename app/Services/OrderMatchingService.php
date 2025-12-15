@@ -162,7 +162,7 @@ class OrderMatchingService
             $trade->save();
 
             // 8. Broadcast event
-            broadcast(new OrderMatched($trade, $buyer->id, $seller->id));
+            broadcast(new OrderMatched($trade));
 
             return $trade;
         });
