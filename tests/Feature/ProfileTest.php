@@ -155,13 +155,13 @@ class ProfileTest extends TestCase
                 'message' => 'Account funded successfully.',
                 'user' => [
                     'id' => $user->id,
-                    'balance' => $initialBalance->plus($fundAmount)->toScale(8)->__toString(),
+                    'balance' => (string) $initialBalance->plus($fundAmount)->toScale(8),
                 ],
             ]);
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
-            'balance' => $initialBalance->plus($fundAmount)->toScale(8)->__toString(),
+            'balance' => (string) $initialBalance->plus($fundAmount)->toScale(8),
         ]);
     }
 
@@ -241,7 +241,7 @@ class ProfileTest extends TestCase
         $user = User::factory()->create(['balance' => '0.00000001']);
         $initialBalance = BigDecimal::of($user->balance);
         $fundAmount = BigDecimal::of('9999'); // Changed to integer
-        $expectedBalance = $initialBalance->plus($fundAmount)->toScale(8)->__toString();
+        $expectedBalance = (string) $initialBalance->plus($fundAmount)->toScale(8);
 
         $response = $this->actingAs($user)->postJson('/api/account/fund', [
             'amount' => (string) $fundAmount, // Sent as integer string
@@ -281,7 +281,7 @@ class ProfileTest extends TestCase
 
         $user->refresh(); // Reload user to get the latest balance
 
-        $expectedFinalBalance = $initialBalance->plus($fundAmount->multipliedBy(5))->toScale(8)->__toString();
+        $expectedFinalBalance = (string) $initialBalance->plus($fundAmount->multipliedBy(5))->toScale(8);
         $this->assertEquals($expectedFinalBalance, $user->balance);
 
         $this->assertDatabaseHas('users', [
