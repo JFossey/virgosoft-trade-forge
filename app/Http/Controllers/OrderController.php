@@ -10,6 +10,7 @@ use App\Http\Resources\TradeResource;
 use App\Models\Order;
 use App\Services\OrderMatchingService;
 use App\Services\OrderService;
+use App\Values\CreateOrderValue;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -69,13 +70,8 @@ class OrderController extends Controller
         $user = $request->user();
 
         // Create order (locks funds/assets)
-        if ($validated['side'] === 'buy') {
-            $order = $this->orderService->createBuyOrder($user, $validated);
-        }
-
-        if ($validated['side'] === 'sell') {
-            $order = $this->orderService->createSellOrder($user, $validated);
-        }
+        $orderData = CreateOrderValue::fromArray($validated);
+        $order = $this->orderService->createOrder($user, $orderData);
 
         // Attempt immediate matching
         $trade = $this->matchingService->attemptMatch($order);

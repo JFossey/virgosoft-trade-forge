@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
 use App\Exceptions\InsufficientAssetsException;
@@ -13,93 +12,11 @@ use App\Exceptions\UnauthorizedOrderAccessException;
 use App\Models\Asset;
 use App\Models\Order;
 use App\Models\User;
+use App\Values\CreateOrderValue;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
-    /**
-     * Create a buy order.
-     *
-     *
-     * @throws InsufficientBalanceException
-     */
-    public function createBuyOrder(User $user, array $data): Order
-    {
-        return DB::transaction(function () use ($user, $data) {
-            // Lock user record
-            $user = User::where('id', $user->id)->lockForUpdate()->first();
-
-            // Calculate required balance
-            $requiredBalance = bcmul($data['price'], $data['amount'], 8);
-
-            // Validate sufficient balance
-            if (bccomp($user->balance, $requiredBalance, 8) < 0) {
-                throw new InsufficientBalanceException(
-                    required: $requiredBalance,
-                    available: $user->balance
-                );
-            }
-
-            // Deduct balance (lock funds)
-            $user->balance = bcsub($user->balance, $requiredBalance, 8);
-            $user->save();
-
-            // Create order
-            $order = new Order;
-            $order->user_id = $user->id;
-            $order->symbol = AssetSymbol::from($data['symbol']);
-            $order->side = OrderSide::BUY;
-            $order->price = $data['price'];
-            $order->amount = $data['amount'];
-            $order->status = OrderStatus::OPEN;
-            $order->save();
-
-            return $order;
-        });
-    }
-
-    /**
-     * Create a sell order.
-     *
-     *
-     * @throws InsufficientAssetsException
-     */
-    public function createSellOrder(User $user, array $data): Order
-    {
-        return DB::transaction(function () use ($user, $data) {
-            // Lock asset record
-            $asset = Asset::where('user_id', $user->id)
-                ->where('symbol', $data['symbol'])
-                ->lockForUpdate()
-                ->first();
-
-            // Validate asset exists and has sufficient amount
-            if (! $asset || bccomp($asset->amount, $data['amount'], 8) < 0) {
-                throw new InsufficientAssetsException(
-                    required: $data['amount'],
-                    available: $asset?->amount ?? '0.00000000'
-                );
-            }
-
-            // Lock assets (move to locked_amount)
-            $asset->amount = bcsub($asset->amount, $data['amount'], 8);
-            $asset->locked_amount = bcadd($asset->locked_amount, $data['amount'], 8);
-            $asset->save();
-
-            // Create order
-            $order = new Order;
-            $order->user_id = $user->id;
-            $order->symbol = AssetSymbol::from($data['symbol']);
-            $order->side = OrderSide::SELL;
-            $order->price = $data['price'];
-            $order->amount = $data['amount'];
-            $order->status = OrderStatus::OPEN;
-            $order->save();
-
-            return $order;
-        });
-    }
-
     /**
      * Cancel an order.
      *
@@ -117,7 +34,7 @@ class OrderService
                 ->first();
 
             // Validate order exists
-            if (! $order) {
+            if ($order === null) {
                 throw new OrderNotFoundException;
             }
 
@@ -133,14 +50,17 @@ class OrderService
                 );
             }
 
-            // Release locked funds/assets
+            // Release locked funds
             if ($order->side === OrderSide::BUY) {
                 // Refund balance
                 $lockedValue = bcmul($order->price, $order->amount, 8);
                 $user = User::where('id', $user->id)->lockForUpdate()->first();
                 $user->balance = bcadd($user->balance, $lockedValue, 8);
                 $user->save();
-            } else {
+            }
+
+            // Release locked assets
+            if ($order->side === OrderSide::SELL) {
                 // Release locked assets
                 $asset = Asset::where('user_id', $user->id)
                     ->where('symbol', $order->symbol->value)
@@ -158,5 +78,74 @@ class OrderService
 
             return $order;
         });
+    }
+
+    /**
+     * Create an order (buy or sell).
+     */
+    public function createOrder(User $user, CreateOrderValue $orderData): Order
+    {
+        return DB::transaction(function () use ($user, $orderData) {
+            if ($orderData->side === OrderSide::BUY) {
+                $this->lockAndValidateBalance($user, $orderData);
+            }
+
+            if ($orderData->side === OrderSide::SELL) {
+                $this->lockAndValidateAsset($user, $orderData);
+            }
+
+            // Create order (common code)
+            $order = new Order;
+            $order->user_id = $user->id;
+            $order->symbol = $orderData->symbol;
+            $order->side = $orderData->side;
+            $order->price = $orderData->price;
+            $order->amount = $orderData->amount;
+            $order->status = OrderStatus::OPEN;
+            $order->save();
+
+            return $order;
+        });
+    }
+
+    /**
+     * Lock user and validate sufficient balance for buy order.
+     */
+    protected function lockAndValidateBalance(User $user, CreateOrderValue $orderData): void
+    {
+        $user = User::where('id', $user->id)->lockForUpdate()->first();
+        $requiredBalance = bcmul($orderData->price, $orderData->amount, 8);
+
+        if (bccomp($user->balance, $requiredBalance, 8) < 0) {
+            throw new InsufficientBalanceException(
+                required: $requiredBalance,
+                available: $user->balance
+            );
+        }
+
+        $user->balance = bcsub($user->balance, $requiredBalance, 8);
+        $user->save();
+    }
+
+    /**
+     * Lock asset and validate sufficient amount for sell order.
+     */
+    protected function lockAndValidateAsset(User $user, CreateOrderValue $orderData): void
+    {
+        $asset = Asset::where('user_id', $user->id)
+            ->where('symbol', $orderData->symbol->value)
+            ->lockForUpdate()
+            ->first();
+
+        if (! $asset || bccomp($asset->amount, $orderData->amount, 8) < 0) {
+            throw new InsufficientAssetsException(
+                required: $orderData->amount,
+                available: $asset?->amount ?? '0.00000000'
+            );
+        }
+
+        $asset->amount = bcsub($asset->amount, $orderData->amount, 8);
+        $asset->locked_amount = bcadd($asset->locked_amount, $orderData->amount, 8);
+        $asset->save();
     }
 }
