@@ -45,7 +45,7 @@
 
 <script setup>
 import { useTradingStore } from '../../store/trading';
-import OrderbookRow from './OrderbookRow.vue'; // Will create this next
+import OrderbookRow from './OrderbookRow.vue';
 
 const tradingStore = useTradingStore();
 </script>
