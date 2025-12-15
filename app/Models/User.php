@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Brick\Math\BigDecimal; // Import BigDecimal
+use Illuminate\Database\Eloquent\Casts\Attribute; // Import Attribute
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -41,7 +42,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'balance' => 'decimal:8',
         ];
     }
 
@@ -59,5 +59,16 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Interact with the user's balance.
+     */
+    protected function balance(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => BigDecimal::of($value ?? '0.00000000'),
+            set: fn (string|int|float|BigDecimal $value) => BigDecimal::of($value)->toScale(8)->__toString(),
+        );
     }
 }

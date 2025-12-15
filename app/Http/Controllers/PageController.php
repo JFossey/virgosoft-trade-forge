@@ -55,4 +55,22 @@ class PageController extends Controller
 
         return redirect()->route('login');
     }
+
+    /**
+     * Backend trade route
+     * Uses auth middleware to protect this route
+     */
+    public function trade()
+    {
+        return view('app');
+    }
+
+    /**
+     * Show the fund account page
+     * Uses auth middleware to protect this route
+     */
+    public function fundAccount()
+    {
+        return view('app');
+    }
 }

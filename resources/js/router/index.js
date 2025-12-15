@@ -5,7 +5,8 @@ import Home from "../components/Home.vue";
 import Login from "../components/Login.vue";
 import Register from "../components/Register.vue";
 import Dashboard from "../components/Dashboard.vue";
-import Trading from "../components/Trading.vue"; // Import the Trading component
+import Trading from "../components/Trading.vue";
+import FundAccount from "../components/trading/FundAccount.vue"; // Import the FundAccount component
 
 const routes = [
     {
@@ -36,6 +37,12 @@ const routes = [
         path: "/trade",
         name: "trade",
         component: Trading, // Use the imported Trading component
+        meta: { requiresAuth: true },
+    },
+    {
+        path: "/account/fund",
+        name: "fundAccount",
+        component: FundAccount, // Use the imported FundAccount component
         meta: { requiresAuth: true },
     },
 ];

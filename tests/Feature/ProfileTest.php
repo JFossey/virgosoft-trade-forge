@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\User;
+use Brick\Math\BigDecimal;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -135,5 +136,124 @@ class ProfileTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonCount(2, 'assets');
+    }
+
+    // New tests for funding account functionality
+    public function test_authenticated_user_can_fund_their_account_successfully(): void
+    {
+        $user = User::factory()->create(['balance' => '100.00']);
+        $initialBalance = BigDecimal::of($user->balance);
+        $fundAmount = BigDecimal::of('50'); // Changed to integer
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'amount' => (string) $fundAmount, // Sent as integer string
+            'confirmation' => true,
+        ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'message' => 'Account funded successfully.',
+                'user' => [
+                    'id' => $user->id,
+                    'balance' => (string) $initialBalance->plus($fundAmount)->toScale(8),
+                ],
+            ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'balance' => (string) $initialBalance->plus($fundAmount)->toScale(8),
+        ]);
+    }
+
+    public function test_unauthenticated_user_cannot_fund_account(): void
+    {
+        $response = $this->postJson('/api/account/fund', [
+            'amount' => '100.00',
+            'confirmation' => true,
+        ]);
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_funding_account_requires_amount(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'confirmation' => true,
+        ]);
+
+        $response->assertJsonValidationErrors('amount');
+    }
+
+    public function test_funding_account_requires_amount_greater_than_zero(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'amount' => '0.00',
+            'confirmation' => true,
+        ]);
+
+        $response->assertJsonValidationErrors('amount');
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'amount' => '-10.00',
+            'confirmation' => true,
+        ]);
+
+        $response->assertJsonValidationErrors('amount');
+    }
+
+    public function test_funding_account_requires_valid_amount_format(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'amount' => 'not-a-number',
+            'confirmation' => true,
+        ]);
+
+        $response->assertJsonValidationErrors('amount');
+    }
+
+    public function test_funding_account_requires_confirmation(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'amount' => '100.00',
+            'confirmation' => false,
+        ]);
+
+        $response->assertJsonValidationErrors('confirmation');
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'amount' => '100.00',
+            // 'confirmation' is missing
+        ]);
+
+        $response->assertJsonValidationErrors('confirmation');
+    }
+
+    public function test_funding_account_updates_user_balance_with_precision(): void
+    {
+        $user = User::factory()->create(['balance' => '0.00000001']);
+        $initialBalance = BigDecimal::of($user->balance);
+        $fundAmount = BigDecimal::of('9999'); // Changed to integer
+        $expectedBalance = (string) $initialBalance->plus($fundAmount)->toScale(8);
+
+        $response = $this->actingAs($user)->postJson('/api/account/fund', [
+            'amount' => (string) $fundAmount, // Sent as integer string
+            'confirmation' => true,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('user.balance', $expectedBalance);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'balance' => $expectedBalance,
+        ]);
     }
 }
