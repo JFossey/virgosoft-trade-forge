@@ -63,4 +63,13 @@ class PageController extends Controller
     {
         return view('app');
     }
+
+    /**
+     * Show the fund account page
+     * Uses auth middleware to protect this route
+     */
+    public function fundAccount()
+    {
+        return view('app');
+    }
 }

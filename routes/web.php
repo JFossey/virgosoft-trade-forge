@@ -28,5 +28,10 @@ Route::get('/trade', [PageController::class, 'index'])
     ->middleware('auth')
     ->name('trade');
 
+// Fund Account route - requires authentication
+Route::get('/account/fund', [PageController::class, 'fundAccount'])
+    ->middleware('auth')
+    ->name('account.fund');
+
 // Backend logout route - performs logout and redirects
 Route::get('/logout', [PageController::class, 'logout'])->name('logout');

@@ -25,9 +25,8 @@ class FundAccountRequest extends FormRequest
         return [
             'amount' => [
                 'required',
-                'numeric',
-                'min:0.00000001', // Minimum amount to fund, preventing zero or negative values
-                'decimal:0,8', // Ensures it's a decimal with up to 8 decimal places
+                'integer',
+                'min:1', // Minimum amount to fund, preventing zero or negative values
             ],
             'confirmation' => [
                 'required',

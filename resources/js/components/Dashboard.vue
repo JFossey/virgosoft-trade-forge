@@ -56,12 +56,18 @@
         <!-- Quick Actions -->
         <div class="bg-white rounded-lg shadow-md p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
                     @click="navigateToTrade"
                     class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                 >
                     Create Order
+                </button>
+                <button
+                    @click="navigateToFundAccount"
+                    class="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
+                >
+                    Fund Account
                 </button>
             </div>
         </div>
@@ -92,5 +98,9 @@ onMounted(async () => {
 
 const navigateToTrade = () => {
     router.push({ name: 'trade' });
+};
+
+const navigateToFundAccount = () => {
+    router.push({ name: 'fundAccount' });
 };
 </script>
