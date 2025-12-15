@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTransferObjects\CreateOrderData;
 use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
@@ -69,13 +70,8 @@ class OrderController extends Controller
         $user = $request->user();
 
         // Create order (locks funds/assets)
-        if ($validated['side'] === 'buy') {
-            $order = $this->orderService->createBuyOrder($user, $validated);
-        }
-
-        if ($validated['side'] === 'sell') {
-            $order = $this->orderService->createSellOrder($user, $validated);
-        }
+        $orderData = CreateOrderData::fromArray($validated);
+        $order = $this->orderService->createOrder($user, $orderData);
 
         // Attempt immediate matching
         $trade = $this->matchingService->attemptMatch($order);
