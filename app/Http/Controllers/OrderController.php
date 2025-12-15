@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
-use App\Exceptions\InsufficientAssetsException;
-use App\Exceptions\InsufficientBalanceException;
 use App\Exceptions\OrderCannotBeCancelledException;
 use App\Exceptions\OrderNotFoundException;
 use App\Exceptions\UnauthorizedOrderAccessException;
@@ -72,50 +70,37 @@ class OrderController extends Controller
 
         $user = $request->user();
 
-        try {
-            // Create order (locks funds/assets)
-            if ($validated['side'] === 'buy') {
-                $order = $this->orderService->createBuyOrder($user, $validated);
-            } else {
-                $order = $this->orderService->createSellOrder($user, $validated);
-            }
+        // Create order (locks funds/assets)
+        // Exceptions bubble up and are handled by Laravel's exception handler
+        if ($validated['side'] === 'buy') {
+            $order = $this->orderService->createBuyOrder($user, $validated);
+        } else {
+            $order = $this->orderService->createSellOrder($user, $validated);
+        }
 
-            // Attempt immediate matching
-            $trade = $this->matchingService->attemptMatch($order);
+        // Attempt immediate matching
+        $trade = $this->matchingService->attemptMatch($order);
 
-            if ($trade) {
-                // Order was matched immediately
-                return response()->json([
-                    'message' => 'Order matched successfully',
-                    'trade' => [
-                        'buyer_id' => $trade->buyer_id,
-                        'seller_id' => $trade->seller_id,
-                        'symbol' => $trade->symbol->value,
-                        'price' => $trade->price,
-                        'amount' => $trade->amount,
-                        'total_value' => $trade->total_value,
-                        'commission' => $trade->commission,
-                    ],
-                ], 200);
-            } else {
-                // Order placed in orderbook
-                return response()->json([
-                    'message' => 'Order placed successfully',
-                    'order' => new OrderResource($order->fresh()),
-                ], 201);
-            }
-        } catch (InsufficientBalanceException $e) {
+        if ($trade) {
+            // Order was matched immediately
             return response()->json([
-                'message' => 'Insufficient balance',
-                'required' => $e->getRequired(),
-                'available' => $e->getAvailable(),
-            ], 400);
-        } catch (InsufficientAssetsException $e) {
+                'message' => 'Order matched successfully',
+                'trade' => [
+                    'buyer_id' => $trade->buyer_id,
+                    'seller_id' => $trade->seller_id,
+                    'symbol' => $trade->symbol->value,
+                    'price' => $trade->price,
+                    'amount' => $trade->amount,
+                    'total_value' => $trade->total_value,
+                    'commission' => $trade->commission,
+                ],
+            ], 200);
+        } else {
+            // Order placed in orderbook
             return response()->json([
-                'message' => 'Insufficient assets',
-                'required' => $e->getRequired(),
-                'available' => $e->getAvailable(),
-            ], 400);
+                'message' => 'Order placed successfully',
+                'order' => new OrderResource($order->fresh()),
+            ], 201);
         }
     }
 

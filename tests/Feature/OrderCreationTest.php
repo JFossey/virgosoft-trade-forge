@@ -51,11 +51,10 @@ class OrderCreationTest extends TestCase
             'amount' => '0.01000000', // Requires $500
         ]);
 
-        $response->assertStatus(400);
-        $response->assertJson([
-            'message' => 'Insufficient balance',
-            'required' => '500.00000000',
-            'available' => '100.00000000',
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['balance']);
+        $response->assertJsonFragment([
+            'balance' => ['Insufficient balance. Required: 500.00000000, Available: 100.00000000'],
         ]);
 
         // Balance unchanged
@@ -135,11 +134,10 @@ class OrderCreationTest extends TestCase
             'amount' => '0.50000000', // Requires 0.5 BTC
         ]);
 
-        $response->assertStatus(400);
-        $response->assertJson([
-            'message' => 'Insufficient assets',
-            'required' => '0.50000000',
-            'available' => '0.25000000',
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['assets']);
+        $response->assertJsonFragment([
+            'assets' => ['Insufficient assets. Required: 0.50000000, Available: 0.25000000'],
         ]);
     }
 
