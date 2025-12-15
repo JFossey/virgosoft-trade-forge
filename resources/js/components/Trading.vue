@@ -42,6 +42,8 @@ onMounted(async () => {
     await tradingStore.fetchProfile();
     await tradingStore.fetchOrderbook();
     tradingStore.subscribeToUserChannel();
+    // Initialize public channel subscription for the default/selected symbol
+    tradingStore.setSelectedSymbol(tradingStore.selectedSymbol);
 });
 
 onUnmounted(() => {
