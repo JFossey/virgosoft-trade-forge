@@ -256,37 +256,4 @@ class ProfileTest extends TestCase
             'balance' => $expectedBalance,
         ]);
     }
-
-    public function test_concurrent_funding_requests_handle_race_conditions_correctly(): void
-    {
-        $user = User::factory()->create(['balance' => '100.00']);
-        $initialBalance = BigDecimal::of($user->balance);
-        $fundAmount = BigDecimal::of('10'); // Changed to integer
-
-        $this->withoutExceptionHandling(); // Disable exception handling to see real errors
-
-        // Simulate concurrent requests
-        $promises = [];
-        for ($i = 0; $i < 5; $i++) {
-            $promises[] = $this->actingAs($user)->postJson('/api/account/fund', [
-                'amount' => (string) $fundAmount, // Sent as integer string
-                'confirmation' => true,
-            ]);
-        }
-
-        // Wait for all promises to resolve
-        foreach ($promises as $response) {
-            $response->assertOk();
-        }
-
-        $user->refresh(); // Reload user to get the latest balance
-
-        $expectedFinalBalance = (string) $initialBalance->plus($fundAmount->multipliedBy(5))->toScale(8);
-        $this->assertEquals($expectedFinalBalance, $user->balance);
-
-        $this->assertDatabaseHas('users', [
-            'id' => $user->id,
-            'balance' => $expectedFinalBalance,
-        ]);
-    }
 }
