@@ -96,10 +96,8 @@ class OrderCancellationTest extends TestCase
         // Try to cancel filled order
         $response = $this->actingAs($seller)->postJson("/api/orders/{$sellOrderId}/cancel");
 
-        $response->assertStatus(400);
-        $response->assertJsonFragment([
-            'message' => 'Order cannot be cancelled',
-        ]);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['order']);
     }
 
     public function test_user_cannot_cancel_already_cancelled_order(): void
@@ -121,10 +119,8 @@ class OrderCancellationTest extends TestCase
         // Try to cancel again
         $response = $this->actingAs($user)->postJson("/api/orders/{$orderId}/cancel");
 
-        $response->assertStatus(400);
-        $response->assertJsonFragment([
-            'message' => 'Order cannot be cancelled',
-        ]);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['order']);
     }
 
     public function test_cancelling_buy_order_refunds_full_balance(): void

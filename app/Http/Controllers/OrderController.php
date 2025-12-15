@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\AssetSymbol;
 use App\Enums\OrderSide;
 use App\Enums\OrderStatus;
-use App\Exceptions\OrderCannotBeCancelledException;
-use App\Exceptions\OrderNotFoundException;
-use App\Exceptions\UnauthorizedOrderAccessException;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Services\OrderMatchingService;
@@ -111,28 +108,12 @@ class OrderController extends Controller
     public function cancel(Request $request, int $id)
     {
         $user = $request->user();
+        $order = $this->orderService->cancelOrder($user, $id);
 
-        try {
-            $order = $this->orderService->cancelOrder($user, $id);
-
-            return response()->json([
-                'message' => 'Order cancelled successfully',
-                'order' => new OrderResource($order),
-            ], 200);
-        } catch (OrderNotFoundException $e) {
-            return response()->json([
-                'message' => 'Order not found',
-            ], 404);
-        } catch (UnauthorizedOrderAccessException $e) {
-            return response()->json([
-                'message' => 'Unauthorized to cancel this order',
-            ], 403);
-        } catch (OrderCannotBeCancelledException $e) {
-            return response()->json([
-                'message' => 'Order cannot be cancelled',
-                'reason' => $e->getMessage(),
-            ], 400);
-        }
+        return response()->json([
+            'message' => 'Order cancelled successfully',
+            'order' => new OrderResource($order),
+        ], 200);
     }
 
     /**
