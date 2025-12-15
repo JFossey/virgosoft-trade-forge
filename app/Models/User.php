@@ -18,9 +18,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        // no mass assignment on user model allowed
     ];
 
     /**
@@ -43,6 +41,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'balance' => 'decimal:8',
         ];
     }
 }
