@@ -1,9 +1,18 @@
 // virgosoft-trade-forge/resources/js/utils/formatters.js
 
 export function formatCurrency(value, currency = 'USD') {
-    if (value === null || value === undefined) return '0.00'; // Return '0.00' for null/undefined
+    // Return '0.00' for null/undefined
+    if (value === null || value === undefined) {
+        return '0.00';
+    }
+
     const number = parseFloat(value);
-    if (isNaN(number)) return '0.00'; // Return '0.00' if not a valid number
+
+    // Return '0.00' if not a valid number
+    if (isNaN(number)) {
+        return '0.00';
+    }
+
     return number.toLocaleString('en-US', {
         style: 'decimal',
         minimumFractionDigits: 2,
@@ -12,9 +21,16 @@ export function formatCurrency(value, currency = 'USD') {
 }
 
 export function formatCrypto(value) {
-    if (value === null || value === undefined) return '';
+    if (value === null || value === undefined) {
+        return '';
+    }
+
     const number = parseFloat(value);
-    if (isNaN(number)) return '';
+
+    if (isNaN(number)) {
+        return '';
+    }
+
     // Cryptocurrencies typically need more precision, up to 8 decimal places
     return number.toLocaleString('en-US', {
         style: 'decimal',
@@ -24,7 +40,17 @@ export function formatCrypto(value) {
 }
 
 export function formatDate(dateString) {
-    if (!dateString) return '';
-    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    if (!dateString) {
+        return '';
+    }
+
+    const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+
     return new Date(dateString).toLocaleDateString('en-US', options);
 }
