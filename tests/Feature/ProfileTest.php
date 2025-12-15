@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,7 +28,8 @@ class ProfileTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/profile');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJson([
                 'user' => [
                     'id' => $user->id,
@@ -43,7 +45,7 @@ class ProfileTest extends TestCase
         $user = User::factory()->create();
 
         // Create BTC asset
-        \App\Models\Asset::factory()
+        Asset::factory()
             ->for($user)
             ->symbol('BTC')
             ->withAmount('0.50000000')
@@ -51,7 +53,7 @@ class ProfileTest extends TestCase
             ->create();
 
         // Create ETH asset
-        \App\Models\Asset::factory()
+        Asset::factory()
             ->for($user)
             ->symbol('ETH')
             ->withAmount('5.00000000')
@@ -60,7 +62,8 @@ class ProfileTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/profile');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonCount(2, 'assets')
             ->assertJsonPath('assets.0.symbol', 'BTC')
             ->assertJsonPath('assets.0.amount', '0.50000000')
@@ -76,7 +79,8 @@ class ProfileTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/profile');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJson([
                 'user' => [
                     'id' => $user->id,
@@ -93,7 +97,7 @@ class ProfileTest extends TestCase
             'balance' => '12345.67890123',
         ]);
 
-        \App\Models\Asset::factory()
+        Asset::factory()
             ->for($user)
             ->symbol('BTC')
             ->withAmount('0.00000001')
@@ -102,7 +106,8 @@ class ProfileTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/profile');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonPath('user.balance', '12345.67890123')
             ->assertJsonPath('assets.0.amount', '0.00000001')
             ->assertJsonPath('assets.0.locked_amount', '0.99999999');
@@ -113,7 +118,7 @@ class ProfileTest extends TestCase
         $user = User::factory()->create();
 
         // Create asset with zero balance
-        \App\Models\Asset::factory()
+        Asset::factory()
             ->for($user)
             ->symbol('BTC')
             ->withAmount('0.00000000')
@@ -121,7 +126,7 @@ class ProfileTest extends TestCase
             ->create();
 
         // Create asset with non-zero balance
-        \App\Models\Asset::factory()
+        Asset::factory()
             ->for($user)
             ->symbol('ETH')
             ->withAmount('1.00000000')
@@ -130,7 +135,8 @@ class ProfileTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/profile');
 
-        $response->assertOk()
+        $response
+            ->assertOk()
             ->assertJsonCount(2, 'assets');
     }
 }
