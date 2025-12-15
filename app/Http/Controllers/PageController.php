@@ -55,4 +55,12 @@ class PageController extends Controller
 
         return redirect()->route('login');
     }
+
+    /**
+     * Serve the main SPA view for unmatched frontend routes.
+     */
+    public function index()
+    {
+        return view('app');
+    }
 }

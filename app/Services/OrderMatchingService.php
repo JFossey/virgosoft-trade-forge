@@ -19,6 +19,9 @@ class OrderMatchingService
     public function attemptMatch(Order $newOrder): ?Trade
     {
         return DB::transaction(function () use ($newOrder) {
+            $buyOrder = null;
+            $sellOrder = null;
+
             if ($newOrder->side === OrderSide::BUY) {
                 $buyOrder = $newOrder;
                 $sellOrder = $this->matchBuyOrder($newOrder);

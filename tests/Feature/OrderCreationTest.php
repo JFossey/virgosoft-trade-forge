@@ -54,7 +54,7 @@ class OrderCreationTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['balance']);
         $response->assertJsonFragment([
-            'balance' => ['Insufficient balance. Required: 500.00000000, Available: 100.00000000'],
+            'errors' => ['balance' => ['Insufficient balance. Required: 500.00000000, Available: 100']],
         ]);
 
         // Balance unchanged

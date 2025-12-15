@@ -13,6 +13,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::get('/profile', [ProfileController::class, 'show'])->name('api.profile');
+    Route::post('/account/fund', [ProfileController::class, 'fund'])->name('api.account.fund');
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Order routes
