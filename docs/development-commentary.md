@@ -46,3 +46,7 @@ I did not use an advanced opinionated starter project as I felt this would be do
 ## Trades Table
 
 The `trades` table was created as a log, even though it would link to associated orders it duplicated as a point in time log amounts and values from the orders that was used to calculate commission.
+
+## Deadlocks/Concurrency/Racing
+
+Race conditions and concurrency issues are prevented using `lockForUpdate` (pessimistic locking) in transactions. This for a small system and low activity, should be reasonable. However, this could be expanded to use Laravel's atomic locks feature if enabled, as well as a two-stage locking system similar to the jobs table, where orders are reserved first before the trade is concluded.
