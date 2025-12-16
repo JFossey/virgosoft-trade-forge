@@ -133,6 +133,8 @@ CACHE_DRIVER=file
 QUEUE_CONNECTION=sync
 SESSION_DRIVER=file
 
+SANCTUM_STATEFUL_DOMAINS=localhost
+
 # Required for real-time features
 PUSHER_APP_ID=your_app_id
 PUSHER_APP_KEY=your_app_key
@@ -176,6 +178,10 @@ npm run dev
 - API: `http://localhost:8000/api`
 
 ---
+
+## Troubleshooting
+
+- If getting login/registration errors and you laravel log has an error `Session store not set on request.` then you need update your `SANCTUM_STATEFUL_DOMAINS` env to match your browser URL.
 
 ## Next Steps
 
