@@ -6,13 +6,13 @@ The database seeder creates test users with pre-configured balances for testing:
 
 ### Test User Accounts
 
-| Email | Password | USD Balance | BTC | ETH |
-|-------|----------|-------------|-----|-----|
-| `trader1@example.com` | `password` | $100,000 | 1.5 BTC | 10 ETH |
-| `trader2@example.com` | `password` | $50,000 | 0.5 BTC | 5 ETH |
-| `trader3@example.com` | `password` | $25,000 | 0.25 BTC | 2.5 ETH |
+| Name | Email | Password | USD Balance | BTC | ETH |
+|------|-------|----------|-------------|-----|-----|
+| Test User 1 | `user1@example.com` | `password` | $100,000 | 10 BTC | 100 ETH |
+| Test User 2 | `user2@example.com` | `password` | $200,000 | 20 BTC | 200 ETH |
+| Test User 3 | `user3@example.com` | `password` | $300,000 | 30 BTC | 300 ETH |
 
-You can use any of these accounts to start trading immediately without manual funding.
+You can use any of these accounts to start trading immediately without registration and manual funding.
 
 ---
 
@@ -27,8 +27,7 @@ Navigate to the application URL and login with one of the test accounts above, o
 After login, you'll see:
 - Your current USD balance
 - Your asset holdings (BTC, ETH)
-- Recent orders
-- Current orderbook
+- Recent activity
 
 ---
 
@@ -44,10 +43,10 @@ After login, you'll see:
 6. Click **Place Order**
 
 **Example Buy Order:**
-- Buy 0.1 BTC at $50,000
-- Cost: 0.1 × $50,000 = $5,000
-- Commission: $5,000 × 0.015 = $75
-- Total deducted: $5,075
+- Buy 1 BTC at $50,000
+- Cost: 1 × $50,000 = $50,000
+- Commission: $50,000 × 0.015 = $750
+- Total deducted: $50,750
 
 Your USD balance will be locked until the order is matched or cancelled.
 
@@ -61,10 +60,10 @@ Your USD balance will be locked until the order is matched or cancelled.
 6. Click **Place Order**
 
 **Example Sell Order:**
-- Sell 0.1 BTC at $50,000
-- Proceeds: 0.1 × $50,000 = $5,000
-- Commission: $5,000 × 0.015 = $75
-- Net received: $4,925
+- Sell 5 ETH at $3,000
+- Proceeds: 5 × $3,000 = $15,000
+- Commission: $15,000 × 0.015 = $225
+- Net received: $14,775
 
 Your assets will be locked until the order is matched or cancelled.
 
@@ -146,9 +145,9 @@ Every trade incurs a **1.5% commission** on the USD value:
 - Shown in order history
 
 **Example:**
-- Trade: 0.5 BTC at $60,000 = $30,000
-- Commission: $30,000 × 0.015 = $450
-- Buyer pays: $30,450 total
+- Trade: 2 BTC at $60,000 = $120,000
+- Commission: $120,000 × 0.015 = $1,800
+- Buyer pays: $121,800 total
 - Seller receives: BTC proceeds (commission already taken from buyer)
 
 ---
@@ -156,10 +155,30 @@ Every trade incurs a **1.5% commission** on the USD value:
 ## Tips for Testing
 
 1. **Use Multiple Accounts** - Login with different test accounts in separate browsers to simulate real trading
+   - User 1 has smaller balance, good for testing insufficient funds
+   - User 2 has medium balance, good for typical trading
+   - User 3 has large balance, good for high-volume testing
 2. **Try Different Prices** - Create orders at various price points to test matching logic
 3. **Watch Real-Time Updates** - Keep multiple windows open to see instant updates
 4. **Test Order Cancellation** - Cancel orders and verify funds are released correctly
 5. **Check Balance Safety** - Try to place orders exceeding your balance to test validation
+
+---
+
+## Example Trading Scenario
+
+To see order matching in action:
+
+1. **Login as User 1** (`user1@example.com`)
+   - Create a BUY order: 1 BTC at $50,000
+
+2. **Login as User 2** (`user2@example.com`) in another browser
+   - Create a SELL order: 1 BTC at $50,000 or less
+
+3. **Watch both accounts** - The orders will match immediately and both users will see:
+   - Updated balances
+   - Order status changed to "Filled"
+   - Real-time notification of the match
 
 ---
 
