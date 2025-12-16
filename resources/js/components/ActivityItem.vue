@@ -56,6 +56,10 @@
 import { computed } from 'vue';
 import { SiBitcoin, SiEthereum } from 'vue-icons-plus/si';
 import { formatCurrency, formatCrypto } from '../utils/formatters';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 const props = defineProps({
     activity: {
@@ -105,19 +109,6 @@ const currencyIconClass = computed(() => {
 });
 
 const timeAgo = computed(() => {
-    const now = new Date();
-    const time = new Date(props.activity.timestamp);
-    const diffMs = now - time;
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins === 1) return '1 minute ago';
-    if (diffMins < 60) return `${diffMins} minutes ago`;
-
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours === 1) return '1 hour ago';
-    if (diffHours < 24) return `${diffHours} hours ago`;
-
-    return time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return dayjs(props.activity.timestamp).fromNow();
 });
 </script>
