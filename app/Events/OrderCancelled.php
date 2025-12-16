@@ -29,7 +29,7 @@ class OrderCancelled implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('orderbook.'.$this->order->symbol->value),
+            new Channel('orderbook'),
             new PrivateChannel('user.'.$this->order->user_id),
         ];
     }

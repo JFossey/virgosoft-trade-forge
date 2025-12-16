@@ -29,7 +29,7 @@ class OrderCreated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('orderbook.'.$this->order->symbol->value), // Public channel for orderbook
+            new Channel('orderbook'), // Public channel for orderbook
             new PrivateChannel('user.'.$this->order->user_id), // Private channel for user's activity feed
         ];
     }

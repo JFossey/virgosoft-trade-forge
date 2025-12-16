@@ -125,22 +125,16 @@ onMounted(async () => {
     // Subscribe to user's private channel for personal notifications
     tradingStore.subscribeToUserChannel();
 
-    // Subscribe to public orderbook channels for platform-wide activity feed
-    window.Echo.channel('orderbook.BTC')
-        .listen('.order.created', handleOrderCreated)
-        .listen('.order.matched', handleOrderMatched)
-        .listen('.order.cancelled', handleOrderCancelled);
-
-    window.Echo.channel('orderbook.ETH')
+    // Subscribe to public orderbook channel for platform-wide activity feed
+    window.Echo.channel('orderbook')
         .listen('.order.created', handleOrderCreated)
         .listen('.order.matched', handleOrderMatched)
         .listen('.order.cancelled', handleOrderCancelled);
 });
 
 onUnmounted(() => {
-    // Clean up public channels
-    window.Echo.leave('orderbook.BTC');
-    window.Echo.leave('orderbook.ETH');
+    // Clean up public channel
+    window.Echo.leave('orderbook');
 });
 
 const handleOrderCreated = (event) => {
