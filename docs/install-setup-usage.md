@@ -82,6 +82,18 @@ ddev npm run build
 
 ### 7. Access Application
 
+To view all `ddev` running services and the ports/urls.
+
+```
+ddev describe
+```
+
+To launch/open the site in the configured URL a browser.
+
+```
+ddev launch
+```
+
 - Frontend: `https://virgosoft-trade-forge.ddev.site`
 - API: `https://virgosoft-trade-forge.ddev.site/api`
 

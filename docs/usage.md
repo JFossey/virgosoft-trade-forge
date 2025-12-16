@@ -12,126 +12,126 @@ The database seeder creates test users with pre-configured balances for testing:
 | Test User 2 | `user2@example.com` | `password` | $200,000 | 20 BTC | 200 ETH |
 | Test User 3 | `user3@example.com` | `password` | $300,000 | 30 BTC | 300 ETH |
 
-You can use any of these accounts to start trading immediately without registration and manual funding.
+You can use any of these accounts to start trading immediately without manual funding.
+
+---
+
+## Suggested Usage
+
+To test the system it is recommended to have two browser windows open, ether of two different browser EG: Chrome & Firefox or one normal and one in private/incognito mode.
+
+Two usage scenarios:
+
+1. Logging in with the same user in both windows.
+2. Logging in as different users in the each window.
 
 ---
 
 ## Getting Started
 
-### 1. Login
+### 1. Login/Register
 
 Navigate to the application URL and login with one of the test accounts above, or create your own account.
 
-### 2. View Your Dashboard
+Alternatively, register a new account.
 
-After login, you'll see:
-- Your current USD balance
-- Your asset holdings (BTC, ETH)
-- Recent activity
+### 2. Dashboard Overview
+
+After login, the dashboard displays:
+
+- **USD Balance** - Your available USD funds
+- **BTC Holdings** - Total BTC amount you own
+- **ETH Holdings** - Total ETH amount you own
+- **Recent Activity** - Last 15 minutes of trading activity from all users
 
 ---
 
-## Trading Features
+## Managing Your Account
+
+### Funding Your Account
+
+Click the **"Fund Account"** button to add USD to your balance:
+
+1. Click **Fund Account** button
+2. Enter the amount you want to add
+3. Submit to instantly credit your account
+4. Your USD balance updates immediately
+
+**Note:** Test accounts are pre-funded.
+
+---
+
+## Trading
+
+### Accessing the Trading Page
+
+Click the **"Create Order"** button on the dashboard to access the buy/sell trading interface.
+
+### Trading Interface Features
+
+The trading page includes:
+- **Symbol Selector** - Switch between BTC and ETH trading pairs
+- **Buy/Sell Toggle** - Choose whether to buy or sell
+- **Price Input** - Enter your desired price per coin (USD)
+- **Amount Input** - Enter the quantity you want to trade
+- **Your Orders** - View your own buy and sell orders for the selected symbol
+- **Order Submission** - Place your order with automatic validation
 
 ### Placing a Buy Order
 
-1. Select a trading pair (BTC/USD or ETH/USD)
-2. Choose **Buy** side
-3. Enter your desired price (USD per coin)
-4. Enter the amount (number of coins)
-5. The system will calculate: `Total Cost = Price × Amount + 1.5% Commission`
-6. Click **Place Order**
+1. Navigate to the **Create Order** page
+2. Select your trading pair (BTC or ETH)
+3. Ensure **Buy** tab selected
+4. Enter your price
+5. Enter the amount you want to buy
+6. Click to place the order
 
-**Example Buy Order:**
-- Buy 1 BTC at $50,000
-- Cost: 1 × $50,000 = $50,000
-- Commission: $50,000 × 0.015 = $750
-- Total deducted: $50,750
-
-Your USD balance will be locked until the order is matched or cancelled.
+The portion of your USD balance is locked until the order matches or you cancel it.
 
 ### Placing a Sell Order
 
-1. Select a trading pair
-2. Choose **Sell** side
-3. Enter your asking price (USD per coin)
-4. Enter the amount (number of coins)
-5. The system will calculate the expected proceeds
-6. Click **Place Order**
+1. Navigate to the **Create Order** page
+2. Select your trading pair (BTC or ETH)
+3. Switch to **Sell** tab
+4. Enter your asking price
+5. Enter the amount you want to sell
+6. Click to place the order
 
-**Example Sell Order:**
-- Sell 5 ETH at $3,000
-- Proceeds: 5 × $3,000 = $15,000
-- Commission: $15,000 × 0.015 = $225
-- Net received: $14,775
+The portion of your assets are locked until the order matches or you cancel it.
 
-Your assets will be locked until the order is matched or cancelled.
+### Viewing Your Orders
 
-### Order Matching
+On the **Create Order** page, you can see:
 
-Orders are matched automatically and synchronously when:
-- A **buy order** finds a sell order at or below the buy price
-- A **sell order** finds a buy order at or above the sell price
+- **Your Buy Orders** - All your open/filled/cancelled buy orders for the selected symbol
+- **Your Sell Orders** - All your open/filled/cancelled sell orders for the selected symbol
 
-Matching happens immediately within the same request, and both parties are notified instantly via the real-time broadcasting system.
+Switch between BTC and ETH to view orders for different trading pairs.
 
-### Viewing Orders
+### Order Statuses
 
-The interface displays three order categories:
-
-#### Open Orders
-- Orders waiting to be matched
-- Can be cancelled at any time
-- Shows locked USD or assets
-
-#### Filled Orders
-- Successfully executed trades
-- Shows final execution price and commission
-- Cannot be modified
-
-#### Cancelled Orders
-- Orders you manually cancelled
-- Locked funds/assets were released
-- Historical record only
-
-### Cancelling Orders
-
-1. Navigate to your **Open Orders** list
-2. Find the order you want to cancel
-3. Click the **Cancel** button
-4. Your locked USD or assets will be immediately released
-
----
-
-## Understanding the Orderbook
-
-The orderbook shows all open orders for a trading pair:
-
-### Buy Side (Bids)
-- Shows all open buy orders
-- Sorted by price (highest first)
-- Green color indicates buy orders
-
-### Sell Side (Asks)
-- Shows all open sell orders
-- Sorted by price (lowest first)
-- Red color indicates sell orders
-
-### Spread
-The difference between the highest buy price and lowest sell price indicates the current market spread.
+- **Open** - Waiting to be matched, funds/assets are locked
+- **Filled** - Successfully matched and executed
+- **Cancelled** - You cancelled the order, funds/assets released
 
 ---
 
 ## Real-Time Updates
 
-The application uses Pusher for real-time updates. You'll receive instant notifications when:
+The application uses Pusher for live updates without page refresh:
 
-- ✅ Your order is matched with another trader
-- ✅ Your balance changes (USD or assets)
-- ✅ New orders appear in the orderbook
-- ✅ Orders are cancelled or filled
+### Where Real-Time Updates Appear
 
-No page refresh needed - the interface updates automatically!
+**Create Order Page:**
+
+- If you have the same user open in multiple browser windows/tabs
+- Your open orders list update instantly across all windows
+
+**Recent Activity (Dashboard):**
+
+- Shows trading activity from **all users** in the last 15 minutes
+- Updates in real-time as any user places or matches orders
+- You can watch the market activity without refreshing
 
 ---
 
@@ -141,59 +141,21 @@ Every trade incurs a **1.5% commission** on the USD value:
 
 - **Commission = Trade Value × 0.015**
 - Deducted from the buyer's USD payment
-- Applied automatically on order matching
-- Shown in order history
+- Applied automatically when orders match
+- Shown in your order history
 
 **Example:**
 - Trade: 2 BTC at $60,000 = $120,000
 - Commission: $120,000 × 0.015 = $1,800
 - Buyer pays: $121,800 total
-- Seller receives: BTC proceeds (commission already taken from buyer)
-
----
-
-## Tips for Testing
-
-1. **Use Multiple Accounts** - Login with different test accounts in separate browsers to simulate real trading
-   - User 1 has smaller balance, good for testing insufficient funds
-   - User 2 has medium balance, good for typical trading
-   - User 3 has large balance, good for high-volume testing
-2. **Try Different Prices** - Create orders at various price points to test matching logic
-3. **Watch Real-Time Updates** - Keep multiple windows open to see instant updates
-4. **Test Order Cancellation** - Cancel orders and verify funds are released correctly
-5. **Check Balance Safety** - Try to place orders exceeding your balance to test validation
-
----
-
-## Example Trading Scenario
-
-To see order matching in action:
-
-1. **Login as User 1** (`user1@example.com`)
-   - Create a BUY order: 1 BTC at $50,000
-
-2. **Login as User 2** (`user2@example.com`) in another browser
-   - Create a SELL order: 1 BTC at $50,000 or less
-
-3. **Watch both accounts** - The orders will match immediately and both users will see:
-   - Updated balances
-   - Order status changed to "Filled"
-   - Real-time notification of the match
+- Seller receives BTC proceeds (commission already taken from buyer)
 
 ---
 
 ## Troubleshooting
 
-### Order Not Matching
-- Verify there's a counter-order at an acceptable price
-- Buy orders match with sells at ≤ buy price
-- Sell orders match with buys at ≥ sell price
-
 ### Real-Time Updates Not Working
-- Check Pusher credentials in `.env`
-- Check browser console for connection errors
 
-### Insufficient Balance Error
-- Check your available USD balance (excludes locked funds)
-- Check your available assets (excludes locked amounts)
-- Remember to account for 1.5% commission
+- Verify Pusher credentials in `.env`
+- Check browser console for WebSocket connection errors
+- Ensure your queues are being processed using the `sync` driver
