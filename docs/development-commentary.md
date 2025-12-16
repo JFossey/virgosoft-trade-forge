@@ -17,6 +17,7 @@ At first, no CI/CD was used. Once I started using PHP Feature tests a github act
 
 The following are issues that existed at the time of writing this, but might be fixed if time permits.
 
+- Create order, is a bad UI name. A better name would be `Manage orders`. If I have time I might fix it.
 - At the time of writing this, there is a bug preventing the sale of any assets.
 - The way the assets vs the dollar input is priced is questionable, it currently assumes you are entering the price per 1 Asset, and then that is used with the quantity. This feels wrong, and if time permits, I would experiment with doing away with the calc and just having it as a price for x assets.
 - Matching only on exact amounts, so it is rarely successful. If time permits, I would have preferred to have the matching of orders to support multiple orders and partial quantities matching.
