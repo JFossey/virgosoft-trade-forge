@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -28,7 +29,8 @@ class OrderCreated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('orderbook.'.$this->order->symbol->value),
+            new Channel('orderbook'), // Public channel for orderbook
+            new PrivateChannel('user.'.$this->order->user_id), // Private channel for user's activity feed
         ];
     }
 

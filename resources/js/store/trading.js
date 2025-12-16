@@ -17,6 +17,7 @@ export const useTradingStore = defineStore('trading', {
             buy_orders: [],
             sell_orders: [],
         },
+        recentActivity: [],
         publicChannel: null,
         privateChannel: null,
         loading: {
@@ -24,12 +25,14 @@ export const useTradingStore = defineStore('trading', {
             orderbook: false,
             createOrder: false,
             cancelOrder: false,
+            activity: false,
         },
         errors: {
             profile: null,
             orderbook: null,
             createOrder: null,
             cancelOrder: null,
+            activity: null,
         },
     }),
 
@@ -136,6 +139,14 @@ export const useTradingStore = defineStore('trading', {
 
             const channelName = `user.${this.profile.user_id}`;
             this.privateChannel = window.Echo.private(channelName)
+                .listen('.order.created', (event) => {
+                    const order = event?.order;
+                    if (!order) {
+                        console.error('Invalid order data received', event);
+                        return;
+                    }
+                    toast.success(`Order created! ${order.side.toUpperCase()} ${order.amount} ${order.symbol} at ${order.price} USD`);
+                })
                 .listen('.order.matched', (event) => {
                     const trade = event?.trade;
                     if (!trade) {
@@ -199,6 +210,39 @@ export const useTradingStore = defineStore('trading', {
                 console.error('Failed to cancel order:', error);
             } finally {
                 this.loading.cancelOrder = false;
+            }
+        },
+
+        async fetchRecentActivity() {
+            this.loading.activity = true;
+            this.errors.activity = null;
+            try {
+                const response = await axios.get('/api/activity');
+                this.recentActivity = response.data.data;
+            } catch (error) {
+                const errMsg = error.response?.data?.message || 'Failed to fetch activity.';
+                this.errors.activity = errMsg;
+                toast.error(errMsg);
+                console.error('Failed to fetch activity:', error);
+            } finally {
+                this.loading.activity = false;
+            }
+        },
+
+        addActivityItem(item) {
+            // Check if this item already exists (prevent duplicates)
+            const existingIndex = this.recentActivity.findIndex(activity => activity.id === item.id);
+            if (existingIndex !== -1) {
+                // Already exists, don't add again
+                return;
+            }
+
+            // Prepend to beginning (most recent first)
+            this.recentActivity.unshift(item);
+
+            // Trim to last 50 items
+            if (this.recentActivity.length > 50) {
+                this.recentActivity = this.recentActivity.slice(0, 50);
             }
         },
     },

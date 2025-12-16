@@ -31,7 +31,7 @@ class OrderMatched implements ShouldBroadcast
         return [
             new PrivateChannel('user.'.$this->trade->buyer_id),
             new PrivateChannel('user.'.$this->trade->seller_id),
-            new Channel('orderbook.'.$this->trade->symbol->value),
+            new Channel('orderbook'),
         ];
     }
 

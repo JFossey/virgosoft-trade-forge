@@ -72,29 +72,119 @@
             </div>
         </div>
 
-        <!-- Recent Activity Placeholder -->
+        <!-- Recent Activity -->
         <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-            <div class="text-center py-8 text-gray-500">
-                <p>No recent activity</p>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Activity (Last 15 Minutes)</h2>
+
+            <!-- Loading State -->
+            <div v-if="tradingStore.loading.activity" class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+                <p class="mt-2 text-gray-500">Loading activity...</p>
+            </div>
+
+            <!-- Error State -->
+            <div v-else-if="tradingStore.errors.activity" class="text-center py-8 text-red-600">
+                <p>{{ tradingStore.errors.activity }}</p>
+            </div>
+
+            <!-- Empty State -->
+            <div v-else-if="tradingStore.recentActivity.length === 0" class="text-center py-8 text-gray-500">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="mt-2">No recent activity in the last 15 minutes</p>
+            </div>
+
+            <!-- Activity List -->
+            <div v-else class="space-y-3">
+                <ActivityItem
+                    v-for="activity in tradingStore.recentActivity"
+                    :key="activity.id"
+                    :activity="activity"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useRouter } from 'vue-router'; // Import useRouter
+import { onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { SiBitcoin, SiEthereum } from 'vue-icons-plus/si';
 import { useTradingStore } from '../store/trading';
 import { formatCurrency, formatCrypto } from '../utils/formatters';
+import ActivityItem from './ActivityItem.vue';
 
 const tradingStore = useTradingStore();
-const router = useRouter(); // Initialize useRouter
+const router = useRouter();
 
 onMounted(async () => {
     await tradingStore.fetchProfile();
+    await tradingStore.fetchRecentActivity();
+
+    // Subscribe to user's private channel for personal notifications
+    tradingStore.subscribeToUserChannel();
+
+    // Subscribe to public orderbook channel for platform-wide activity feed
+    window.Echo.channel('orderbook')
+        .listen('.order.created', handleOrderCreated)
+        .listen('.order.matched', handleOrderMatched)
+        .listen('.order.cancelled', handleOrderCancelled);
 });
+
+onUnmounted(() => {
+    // Clean up public channel
+    window.Echo.leave('orderbook');
+});
+
+const handleOrderCreated = (event) => {
+    const order = event?.order;
+    if (!order) return;
+
+    tradingStore.addActivityItem({
+        id: `order-created-${order.id}`,
+        activity_type: 'order_created',
+        symbol: order.symbol,
+        side: order.side,
+        price: order.price,
+        amount: order.amount,
+        total_value: (parseFloat(order.price) * parseFloat(order.amount)).toFixed(8),
+        timestamp: order.created_at,
+    });
+};
+
+const handleOrderMatched = (event) => {
+    const trade = event?.trade;
+    if (!trade) return;
+
+    tradingStore.addActivityItem({
+        id: `trade-${trade.id}`,
+        activity_type: 'trade',
+        symbol: trade.symbol,
+        side: 'trade',
+        price: trade.price,
+        amount: trade.amount,
+        total_value: trade.total_value,
+        commission: trade.commission,
+        timestamp: trade.created_at,
+    });
+};
+
+const handleOrderCancelled = (event) => {
+    const order = event?.order;
+    if (!order) return;
+
+    tradingStore.addActivityItem({
+        id: `order-cancelled-${order.id}`,
+        activity_type: 'order_cancelled',
+        symbol: order.symbol,
+        side: order.side,
+        price: order.price,
+        amount: order.amount,
+        total_value: (parseFloat(order.price) * parseFloat(order.amount)).toFixed(8),
+        timestamp: order.created_at,
+    });
+};
 
 const navigateToTrade = () => {
     router.push({ name: 'trade' });
