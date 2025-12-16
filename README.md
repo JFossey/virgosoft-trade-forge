@@ -8,5 +8,6 @@ A full-stack limit-order exchange mini engine built with Laravel and Vue.js, fea
 
 - 📦 [Install & Setup](docs/install-setup-usage.md)
 - 🚀 [Usage Guide](docs/usage.md)
+- 📸 [Screenshots](docs/screenshots.md)
 - 💬 [Development Commentary](docs/development-commentary.md)
 - 🤖 [Use of AI](docs/use-of-ai.md)
