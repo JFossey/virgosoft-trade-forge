@@ -5,58 +5,34 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Http\Resources\ActivityResource;
 use App\Models\Order;
-use App\Models\Trade;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 class ActivityController extends Controller
 {
     /**
+     * Time window in minutes considered recent activity.
+     */
+    public const ACTIVITY_TIME_WINDOW = 15;
+
+    /**
      * Get recent activity for all users on the platform.
      *
-     * Returns trades, order creations, and order cancellations from the last 15 minutes.
+     * Returns order activity (created, filled, cancelled) from the last 15 minutes.
+     * Uses order status to determine activity type:
+     * - OPEN = order created
+     * - FILLED = trade executed
+     * - CANCELLED = order cancelled
      */
     public function index(Request $request)
     {
-        $fifteenMinutesAgo = now()->subMinutes(15);
+        $fifteenMinutesAgo = now()->subMinutes(self::ACTIVITY_TIME_WINDOW);
 
-        // Get all trades from last 15 minutes
-        $trades = Trade::where('created_at', '>=', $fifteenMinutesAgo)
-            ->get()
-            ->map(fn ($trade) => [
-                'type' => 'trade',
-                'model' => $trade,
-                'timestamp' => $trade->created_at,
-            ]);
+        $orders = Order::where('updated_at', '>=', $fifteenMinutesAgo)
+            ->whereIn('status', [OrderStatus::OPEN, OrderStatus::FILLED, OrderStatus::CANCELLED])
+            ->orderByDesc('updated_at')
+            ->limit(50)
+            ->get();
 
-        // Get newly created orders (OPEN status)
-        $orderCreations = Order::where('status', OrderStatus::OPEN)
-            ->where('created_at', '>=', $fifteenMinutesAgo)
-            ->get()
-            ->map(fn ($order) => [
-                'type' => 'order_created',
-                'model' => $order,
-                'timestamp' => $order->created_at,
-            ]);
-
-        // Get cancelled orders (CANCELLED status)
-        $orderCancellations = Order::where('status', OrderStatus::CANCELLED)
-            ->where('updated_at', '>=', $fifteenMinutesAgo)
-            ->get()
-            ->map(fn ($order) => [
-                'type' => 'order_cancelled',
-                'model' => $order,
-                'timestamp' => $order->updated_at,
-            ]);
-
-        // Merge all activities and sort by timestamp (most recent first)
-        $allActivity = $trades
-            ->concat($orderCreations)
-            ->concat($orderCancellations)
-            ->sortByDesc('timestamp')
-            ->take(50)
-            ->map(fn ($item) => $item['model']);
-
-        return ActivityResource::collection($allActivity);
+        return ActivityResource::collection($orders);
     }
 }
