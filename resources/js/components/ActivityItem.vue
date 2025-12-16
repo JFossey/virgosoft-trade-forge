@@ -64,32 +64,36 @@ const props = defineProps({
     },
 });
 
+const activityLabels = {
+    trade: 'Trade Executed',
+    order_created: 'Order Placed',
+    order_cancelled: 'Order Cancelled',
+};
+
 const activityLabel = computed(() => {
-    switch (props.activity.activity_type) {
-        case 'trade': return 'Trade Executed';
-        case 'order_created': return 'Order Placed';
-        case 'order_cancelled': return 'Order Cancelled';
-        default: return 'Activity';
-    }
+    return activityLabels[props.activity.activity_type] || 'Activity';
 });
+
+const iconContainerClasses = {
+    trade: 'bg-green-100 text-green-600',
+    order_created: 'bg-blue-100 text-blue-600',
+    order_cancelled: 'bg-red-100 text-red-600',
+};
 
 const iconContainerClass = computed(() => {
     const base = 'h-10 w-10 rounded-full flex items-center justify-center';
-    switch (props.activity.activity_type) {
-        case 'trade': return `${base} bg-green-100 text-green-600`;
-        case 'order_created': return `${base} bg-blue-100 text-blue-600`;
-        case 'order_cancelled': return `${base} bg-red-100 text-red-600`;
-        default: return `${base} bg-gray-100 text-gray-600`;
-    }
+    const specificClass = iconContainerClasses[props.activity.activity_type] || 'bg-gray-100 text-gray-600';
+    return `${base} ${specificClass}`;
 });
 
+const activityLabelClasses = {
+    trade: 'text-green-700',
+    order_created: 'text-blue-700',
+    order_cancelled: 'text-red-700',
+};
+
 const activityLabelClass = computed(() => {
-    switch (props.activity.activity_type) {
-        case 'trade': return 'text-green-700';
-        case 'order_created': return 'text-blue-700';
-        case 'order_cancelled': return 'text-red-700';
-        default: return 'text-gray-700';
-    }
+    return activityLabelClasses[props.activity.activity_type] || 'text-gray-700';
 });
 
 const sideClass = computed(() => {
