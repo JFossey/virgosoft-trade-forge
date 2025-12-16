@@ -159,3 +159,4 @@ Every trade incurs a **1.5% commission** on the USD value:
 - Verify Pusher credentials in `.env`
 - Check browser console for WebSocket connection errors
 - Ensure your queues are being processed using the `sync` driver
+
