@@ -6,6 +6,7 @@ A full-stack limit-order exchange mini engine built with Laravel and Vue.js, fea
 
 ## Documentation
 
-- 📦 [Install, Setup and Usage](docs/install-setup-usage.md)
+- 📦 [Install & Setup](docs/install-setup-usage.md)
+- 🚀 [Usage Guide](docs/usage.md)
 - 💬 [Development Commentary](docs/development-commentary.md)
 - 🤖 [Use of AI](docs/use-of-ai.md)

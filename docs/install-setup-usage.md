@@ -1,4 +1,4 @@
-# 📦 Install, Setup and Usage
+# 📦 Install & Setup
 
 ## Prerequisites
 
@@ -16,8 +16,10 @@ cd virgosoft-trade-forge
 
 ## Setup Options
 
-1. A quick start docker setup has been provided using the ddev _(recommended)_.
+1. A quick start docker setup has been provided using ddev _(recommended)_.
 2. Alternatively, instructions for manual local host setup is also provided.
+
+---
 
 ## Quick Setup using DDEV
 
@@ -35,7 +37,7 @@ Once installed most commands can be run in ddev using by using the `ddev exec` c
 
 All instruction are for the `exec` version, to use the `ssh` version just run the command without the `ddev exec` or see the manual setup examples as they are similar.
 
-### 2. Start DDEV Env
+### 2. Start DDEV Environment
 
 ```bash
 ddev start
@@ -56,9 +58,9 @@ ddev exec php artisan key:generate
 ```
 
 Edit `.env` and configure:
-- Pusher credentials for real-time broadcasting
+- **Pusher credentials** for real-time broadcasting (required for real-time features)
 - Database credentials (already configured for DDEV)
-- Queue connection sync (already configured for DDEV)
+- Queue connection (already configured to use `sync` for DDEV)
 
 ### 5. Run Migrations and Seeders
 
@@ -66,10 +68,15 @@ Edit `.env` and configure:
 ddev exec php artisan migrate --seed
 ```
 
-### 6. Build Frontend Assets
+This will create test users with pre-funded accounts. See [Usage Guide](usage.md#seed-data--test-accounts) for login credentials.
+
+### 6. Start Development Server
 
 ```bash
-# Vite build
+# For development with hot reloading
+ddev npm run dev
+
+# OR for production build
 ddev npm run build
 ```
 
@@ -82,14 +89,14 @@ ddev npm run build
 
 ## Manual Setup
 
-### 2. Install Dependencies
+### 1. Install Dependencies
 
 ```bash
 composer install
 npm install
 ```
 
-### 3. Configure Environment
+### 2. Configure Environment
 
 ```bash
 cp .env.example .env
@@ -110,21 +117,20 @@ DB_USERNAME=root
 DB_PASSWORD=
 
 BROADCAST_DRIVER=pusher
-CACHE_DRIVER=redis
-QUEUE_CONNECTION=redis
-SESSION_DRIVER=redis
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
 
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
+# Required for real-time features
 PUSHER_APP_ID=your_app_id
 PUSHER_APP_KEY=your_app_key
 PUSHER_APP_SECRET=your_app_secret
 PUSHER_APP_CLUSTER=your_cluster
 ```
 
-### 4. Create Database
+**Note:** `QUEUE_CONNECTION=sync` processes orders synchronously within the same request.
+
+### 3. Create Database
 
 Create a new database matching your `DB_DATABASE` value:
 
@@ -132,13 +138,15 @@ Create a new database matching your `DB_DATABASE` value:
 CREATE DATABASE trade_forge CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 5. Run Migrations and Seeders
+### 4. Run Migrations and Seeders
 
 ```bash
 php artisan migrate --seed
 ```
 
-### 6. Start Development Servers
+This will create test users with pre-funded accounts. See [Usage Guide](usage.md#seed-data--test-accounts) for login credentials.
+
+### 5. Start Development Servers
 
 Open two terminal windows:
 
@@ -146,46 +154,21 @@ Open two terminal windows:
 # Terminal 1 - Laravel development server
 php artisan serve
 
-# Terminal 3 - Vite dev server
+# Terminal 2 - Vite dev server
 npm run dev
 ```
 
-### 7. Access Application
+### 6. Access Application
 
 - Frontend: `http://localhost:8000`
 - API: `http://localhost:8000/api`
 
 ---
 
-## Usage
+## Next Steps
 
-### Creating an Account
-
-1. Register a new user account
-2. Login with your credentials
-3. Your account starts with $0 USD balance
-
-### Funding Your Account
-
-Use the profile page to add USD funds to your account balance.
-
-### Placing Orders
-
-1. Navigate to the trading interface
-2. Select a symbol (BTC or ETH)
-3. Choose Buy or Sell
-4. Enter price and amount
-5. Click "Place Order"
-
-### Viewing Orders
-
-- **Open Orders**: Currently active orders waiting to be matched
-- **Filled Orders**: Successfully executed trades
-- **Cancelled Orders**: Orders you've manually cancelled
-
-### Real-Time Updates
-
-The interface automatically updates when:
-- Your order is matched
-- Your balance changes
-- New orders appear in the orderbook
+Once installation is complete, see the [Usage Guide](usage.md) to learn how to:
+- Login with test accounts
+- Place buy and sell orders
+- View and manage your orders
+- Understand the commission structure
