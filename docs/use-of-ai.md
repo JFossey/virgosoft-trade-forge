@@ -72,3 +72,7 @@ AI would be used to create a branch and a PR. The PR was then reviewed and itera
 Each PR was not made to be perfect before merging. Quality of code was considered, but I was trying to balance speed and velocity with quality and completeness. Incomplete PRs were also merged so as to unblock work taking place in another branch, as dependency blockers were common at different phases.
 
 Once all AI agents usage limits were reached, only hand coding without any AI was the only option until the limits reset.
+
+## Best Results
+
+AI was found to be most useful for scaffolding UI and tests with some panel beating. All business logic or complex logic required a lot more work to be usable and in a decent shape.
