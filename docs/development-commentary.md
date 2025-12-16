@@ -21,6 +21,8 @@ The following are issues that existed at the time of writing this, but might be 
 - At the time of writing this, there is a bug preventing the sale of any assets.
 - The way the assets vs the dollar input is priced is questionable, it currently assumes you are entering the price per 1 Asset, and then that is used with the quantity. This feels wrong, and if time permits, I would experiment with doing away with the calc and just having it as a price for x assets.
 - Matching only on exact amounts, so it is rarely successful. If time permits, I would have preferred to have the matching of orders to support multiple orders and partial quantities matching.
+- The user balance in USD is stored to a precision of 8, matching what is used on the crypto assets. This is probably not needed and should probably be set to decimal precision of 2 to avoid any issues with fractions of a cent.
+- All crypto assets are assumed to support/use fractions of a unit up to 8 decimal places, the standard for BTC. However, ETH and others do support greater fractions.
 
 ## Code Quality
 
